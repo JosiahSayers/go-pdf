@@ -1,14 +1,12 @@
-import { Button } from "@mantine/core";
+import { useTheme } from "@emotion/react";
+import { Button, useMantineTheme } from "@mantine/core";
 import type { FileWithPath } from "@mantine/dropzone";
 import { PDF_MIME_TYPE } from "@mantine/dropzone";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import {
-  unstable_composeUploadHandlers,
-  unstable_createMemoryUploadHandler,
-} from "@remix-run/node";
 import { unstable_parseMultipartFormData } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { IconX } from "@tabler/icons-react";
 import { useCallback } from "react";
 import Dropzone from "~/components/dropzone";
 import { Storage } from "~/utils/storage.server";
@@ -22,17 +20,14 @@ export const loader: LoaderFunction = async () => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const fullUploadHandler = unstable_composeUploadHandlers(
-    uploadHandler,
-    unstable_createMemoryUploadHandler()
-  );
-  await unstable_parseMultipartFormData(request, fullUploadHandler);
+  await unstable_parseMultipartFormData(request, uploadHandler);
   return null;
 };
 
 export default function TestUpload() {
   const { existingObjects } = useLoaderData();
   const fetcher = useFetcher();
+  const theme = useMantineTheme();
 
   const handleDrop = useCallback(
     (newFile: FileWithPath[]) => {
@@ -43,6 +38,21 @@ export default function TestUpload() {
         method: "post",
         encType: "multipart/form-data",
       });
+    },
+    [fetcher]
+  );
+
+  const deleteFile = useCallback(
+    (fileUrl) => {
+      fetcher.submit(
+        {
+          url: fileUrl,
+        },
+        {
+          method: "delete",
+          action: "/api/delete-file",
+        }
+      );
     },
     [fetcher]
   );
@@ -60,14 +70,20 @@ export default function TestUpload() {
           multiple={false}
           name="file"
         />
-        <Button type="submit">Upload</Button>
       </Form>
 
       <br />
       <ul>
         {existingObjects.map((obj) => (
-          <li key={obj.id}>
+          <li key={obj.id} style={{ display: "flex" }}>
             <a href={`/get-contents/${obj.url}`}>{obj.name}</a>
+            <IconX
+              size="1.5rem"
+              stroke={1.5}
+              color={theme.colors.red[theme.colorScheme === "dark" ? 4 : 6]}
+              style={{ cursor: "pointer" }}
+              onClick={() => deleteFile(obj.url)}
+            />
           </li>
         ))}
       </ul>

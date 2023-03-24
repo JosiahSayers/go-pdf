@@ -1,7 +1,6 @@
 import { PassThrough } from 'stream';
-import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
 import aws from 'aws-sdk';
-import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "~/utils/db.server";
 
 const client = new S3Client({
@@ -27,17 +26,7 @@ async function getFile(fileUrl: string) {
   }
 }
 
-async function storeFile(Key: string, Body: PutObjectCommandInput['Body']) {
-  try {
-    const file = await db.file.create({ data: { name: Key, url: Key } });
-    return await client.send(new PutObjectCommand({ Bucket, Key: file.id, Body }));
-  } catch (e) {
-    console.error('Error storing file in bucket', { Key, error: e });
-    throw e;
-  }
-}
-
-async function uploadStream(key: string) {
+async function uploadStream(key: string, contentType: string) {
   const s3 = new aws.S3({
     region: 'auto',
     endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -46,10 +35,22 @@ async function uploadStream(key: string) {
       secretAccessKey: process.env.R2_ACCESS_KEY!,
     }
   });
+
   const pass = new PassThrough();
+  
   return {
     writeStream: pass,
-    promise: s3.upload({ Bucket, Key: key, Body: pass }).promise()
+    promise: s3.upload({ Bucket, Key: key, Body: pass, ContentType: contentType }).promise()
+  }
+}
+
+async function deleteFile(fileUrl: string) {
+  try {
+    const file = await db.file.delete({ where: { url: fileUrl } });
+    return client.send(new DeleteObjectCommand({ Bucket, Key: file.id }));
+  } catch (e) {
+    console.error('Error deleting file', { fileUrl, error: e });
+    throw e;
   }
 }
 
@@ -63,8 +64,8 @@ async function getAllObjects() {
 }
 
 export const Storage = {
+  deleteFile,
   getFile,
-  storeFile,
   uploadStream,
   getAllObjects,
 };
