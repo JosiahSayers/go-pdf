@@ -12,23 +12,13 @@ if (!existingBuckets.some(bucket => bucket.name === bucketName)) {
   await $`wrangler r2 bucket create ${bucketName}`;
 }
 
-await ensureEnvFileExists()
+await ensureEnvFileExists();
 await writeToEnv('R2_BUCKET', bucketName);
 await writeToEnv('R2_ACCOUNT_ID', accountId);
 
 console.log(chalk.green(`r2 bucket "${bucketName}" has been created.`));
-const { exists: keyIdExists } = await doesEnvVarExist('R2_ACCESS_KEY_ID');
-const { exists: keyExists } = await doesEnvVarExist('R2_ACCESS_KEY');
 
-if (!keyIdExists || !keyExists) {
-  console.log(`Now, let's get your API access key created`);
-  console.log(`Opening a browser to cloudflare, please follow the instructions here to create a new key: https://developers.cloudflare.com/r2/api/s3/tokens/`);
-  await $`open https://dash.cloudflare.com/${accountId}/r2/overview/api-tokens`.quiet();
-  const keyId = await question('Access Key ID: ');
-  const key = await question('Access Key: ');
-  await writeToEnv('R2_ACCESS_KEY_ID', keyId);
-  await writeToEnv('R2_ACCESS_KEY', key);
-}
+await checkAccessKeys();
 
 console.log(chalk.green('All done!'));
 
@@ -86,4 +76,19 @@ async function doesEnvVarExist(envVar) {
   const searchExpression = new RegExp(`^${envVar}=[a-zA-Z0-9-]+$`, 'gm');
   const exists = searchExpression.test(envFile);
   return { exists, envFile, searchExpression };
+}
+
+async function checkAccessKeys() {
+  const { exists: keyIdExists } = await doesEnvVarExist('R2_ACCESS_KEY_ID');
+  const { exists: keyExists } = await doesEnvVarExist('R2_ACCESS_KEY');
+  
+  if (!keyIdExists || !keyExists) {
+    console.log(`Now, let's get your API access key created`);
+    console.log(`Opening a browser to cloudflare, please follow the instructions here to create a new key: https://developers.cloudflare.com/r2/api/s3/tokens/`);
+    await $`open https://dash.cloudflare.com/${accountId}/r2/overview/api-tokens`.quiet();
+    const keyId = await question('Access Key ID: ');
+    const key = await question('Access Key: ');
+    await writeToEnv('R2_ACCESS_KEY_ID', keyId);
+    await writeToEnv('R2_ACCESS_KEY', key);
+  }
 }
