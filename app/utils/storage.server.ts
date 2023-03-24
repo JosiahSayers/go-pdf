@@ -1,5 +1,6 @@
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
-import { S3Client, GetObjectCommand, PutObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { db } from "~/utils/db.server";
 
 const client = new S3Client({
   region: 'auto',
@@ -11,18 +12,23 @@ const client = new S3Client({
 });
 const Bucket = process.env.R2_BUCKET;
 
-async function getFile(Key: string) {
+async function getFile(fileUrl: string) {
   try {
-    return await client.send(new GetObjectCommand({ Bucket, Key }));
+    const file = await db.file.findUnique({ where: { url: fileUrl } });
+    if (!file) {
+      throw new Error(`Unable to find file in database`);
+    }
+    return await client.send(new GetObjectCommand({ Bucket, Key: file.id }));
   } catch (e) {
-    console.error('Error getting file from bucket', { Key, error: e });
+    console.error('Error getting file from bucket', { fileUrl, error: e });
     throw e;
   }
 }
 
 async function storeFile(Key: string, Body: PutObjectCommandInput['Body']) {
   try {
-    return await client.send(new PutObjectCommand({ Bucket, Key, Body }));
+    const file = await db.file.create({ data: { name: Key, url: Key } });
+    return await client.send(new PutObjectCommand({ Bucket, Key: file.id, Body }));
   } catch (e) {
     console.error('Error storing file in bucket', { Key, error: e });
     throw e;
@@ -31,7 +37,7 @@ async function storeFile(Key: string, Body: PutObjectCommandInput['Body']) {
 
 async function getAllObjects() {
   try {
-    return await client.send(new ListObjectsV2Command({ Bucket }));
+    return db.file.findMany();
   } catch (e) {
     console.error('Error grabbing bucket objects', e);
     throw e;
