@@ -1,4 +1,6 @@
+import { PassThrough } from 'stream';
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
+import aws from 'aws-sdk';
 import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "~/utils/db.server";
 
@@ -10,7 +12,7 @@ const client = new S3Client({
     secretAccessKey: process.env.R2_ACCESS_KEY!,
   }
 });
-const Bucket = process.env.R2_BUCKET;
+const Bucket = process.env.R2_BUCKET!;
 
 async function getFile(fileUrl: string) {
   try {
@@ -35,6 +37,22 @@ async function storeFile(Key: string, Body: PutObjectCommandInput['Body']) {
   }
 }
 
+async function uploadStream(key: string) {
+  const s3 = new aws.S3({
+    region: 'auto',
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_ACCESS_KEY!,
+    }
+  });
+  const pass = new PassThrough();
+  return {
+    writeStream: pass,
+    promise: s3.upload({ Bucket, Key: key, Body: pass }).promise()
+  }
+}
+
 async function getAllObjects() {
   try {
     return db.file.findMany();
@@ -47,5 +65,6 @@ async function getAllObjects() {
 export const Storage = {
   getFile,
   storeFile,
+  uploadStream,
   getAllObjects,
 };
