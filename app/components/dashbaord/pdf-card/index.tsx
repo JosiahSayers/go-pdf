@@ -15,6 +15,7 @@ import { IconFileText } from "@tabler/icons-react";
 import { useCallback } from "react";
 import { openContextModal } from "@mantine/modals";
 import PdfCardDeleteButton from "~/components/dashbaord/pdf-card/delete-button";
+import PdfCardActionButton from "~/components/dashbaord/pdf-card/action-button";
 
 interface Props {
   file: SerializeFrom<File>;
@@ -41,6 +42,16 @@ export default function PdfCard({ file }: Props) {
       centered: true,
       innerProps: {
         modalBody: "Subscribe to unlock password protection options",
+      },
+    });
+
+  const openQrCodeModal = () =>
+    openContextModal({
+      modal: "qrCode",
+      title: "Get A QR Code",
+      centered: true,
+      innerProps: {
+        fileId: file.id,
       },
     });
 
@@ -73,27 +84,16 @@ export default function PdfCard({ file }: Props) {
             </Stack>
           </Grid.Col>
           <Grid.Col span="auto">
-            <Stack px="5rem">
-              <Button
-                compact
-                variant="subtle"
-                styles={{
-                  root: {
-                    width: "fit-content",
-                  },
-                }}
-                onClick={openAnalyticsModal}
-              >
+            <Stack px="5rem" spacing="xs">
+              <PdfCardActionButton onClick={openAnalyticsModal}>
                 Analytics
-              </Button>
-              <Button
-                compact
-                variant="subtle"
-                styles={{ root: { width: "fit-content" } }}
-                onClick={openPasswordProtectionModal}
-              >
+              </PdfCardActionButton>
+              <PdfCardActionButton onClick={openPasswordProtectionModal}>
                 Password Protection
-              </Button>
+              </PdfCardActionButton>
+              <PdfCardActionButton onClick={openQrCodeModal}>
+                QR Code
+              </PdfCardActionButton>
             </Stack>
           </Grid.Col>
           <Grid.Col span="content">
