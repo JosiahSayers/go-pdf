@@ -1,8 +1,16 @@
-import { Card, Collapse, Group, Stack, Text, TextInput } from "@mantine/core";
+import {
+  Anchor,
+  Card,
+  Collapse,
+  Grid,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { File } from "@prisma/client";
 import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
 import { IconFile } from "@tabler/icons-react";
 import { useCallback } from "react";
 import PdfCardDeleteButton from "~/components/dashbaord/pdf-card/delete-button";
@@ -14,6 +22,7 @@ interface Props {
 export default function PdfCard({ file }: Props) {
   const [show, { toggle }] = useDisclosure(true);
   const fetcher = useFetcher();
+
   const deleteFile = useCallback(() => {
     toggle();
     fetcher.submit(
@@ -30,21 +39,23 @@ export default function PdfCard({ file }: Props) {
   return (
     <Collapse in={show} transitionDuration={500}>
       <Card shadow="sm" padding="lg" withBorder>
-        <Group position="apart">
-          <Group w={600}>
+        <Grid align="center">
+          <Grid.Col span="content">
             <IconFile height={75} width={50} />
+          </Grid.Col>
+          <Grid.Col span={6}>
             <Stack ml="sm">
-              <Text weight="bold">{file.name}</Text>
-              <TextInput
-                aria-label="URL"
-                type="text"
-                name="url"
-                defaultValue={file.url}
-              />
+              <Text weight="bold" size="lg">
+                {file.name}
+              </Text>
+              <Anchor href={`/${file.url}`}>pdf.me/{file.url}</Anchor>
             </Stack>
-          </Group>
-          <PdfCardDeleteButton onDelete={deleteFile} />
-        </Group>
+          </Grid.Col>
+          <Grid.Col span="auto" />
+          <Grid.Col span="content">
+            <PdfCardDeleteButton onDelete={deleteFile} />
+          </Grid.Col>
+        </Grid>
       </Card>
     </Collapse>
   );
