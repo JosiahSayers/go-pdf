@@ -19,7 +19,10 @@ async function getFile(fileUrl: string) {
     if (!file) {
       throw new Error(`Unable to find file in database`);
     }
-    return await client.send(new GetObjectCommand({ Bucket, Key: file.id }));
+    return {
+      file,
+      fileStore: await client.send(new GetObjectCommand({ Bucket, Key: file.id }))
+    };
   } catch (e) {
     console.error('Error getting file from bucket', { fileUrl, error: e });
     throw e;
