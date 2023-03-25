@@ -13,9 +13,22 @@ const client = new S3Client({
 });
 const Bucket = process.env.R2_BUCKET!;
 
-async function getFile(fileUrl: string) {
+interface GetFileByUrlParams {
+  fileUrl: string;
+  id?: undefined;
+}
+
+interface GetFileByIdParams {
+  id: string;
+  fileUrl?: undefined;
+}
+
+type GetFileParams = GetFileByUrlParams | GetFileByIdParams;
+
+async function getFile({ fileUrl, id }: GetFileParams) {
   try {
-    const file = await db.file.findUnique({ where: { url: fileUrl } });
+    const where = fileUrl ? { url: fileUrl } : { id };
+    const file = await db.file.findUnique({ where });
     if (!file) {
       throw new Error(`Unable to find file in database`);
     }

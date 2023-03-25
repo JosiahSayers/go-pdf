@@ -4,10 +4,10 @@ import { Storage } from "~/utils/storage.server";
 
 export async function loader({ params }: LoaderArgs) {
   try {
-    const {file, fileStore} = await Storage.getFile({ fileUrl: params.fileUrl! });
+    const {file, fileStore} = await Storage.getFile({ id: params.id! });
     await db.fileEvent.create({ data: {
       fileId: file.id,
-      event: 'view'
+      event: 'qr_code_view'
     }});
     const headers = new Headers();
     headers.set("Content-Type", "application/pdf");
