@@ -1,4 +1,4 @@
-import { useMantineTheme } from "@mantine/core";
+import { Space, useMantineTheme } from "@mantine/core";
 import type { FileWithPath } from "@mantine/dropzone";
 import { PDF_MIME_TYPE } from "@mantine/dropzone";
 import type { ActionArgs } from "@remix-run/node";
@@ -58,21 +58,19 @@ export default function TestUpload() {
 
   return (
     <>
-      <h1>Test Page</h1>
-      <Form method="post" encType="multipart/form-data">
-        <Dropzone
-          onDrop={handleDrop}
-          onReject={console.log}
-          accept={PDF_MIME_TYPE}
-          maxSize={TEN_MB}
-          maxFiles={1}
-          multiple={false}
-          name="file"
-          loading={fetcher.state !== "idle"}
-        />
-      </Form>
+      <Dropzone
+        onDrop={handleDrop}
+        onReject={console.log}
+        accept={PDF_MIME_TYPE}
+        maxSize={TEN_MB}
+        maxFiles={1}
+        multiple={false}
+        name="file"
+        loading={fetcher.state !== "idle"}
+      />
 
-      <br />
+      <Space h="xl" />
+
       <ul>
         {existingObjects.map((obj) => (
           <li key={obj.id} style={{ display: "flex" }}>

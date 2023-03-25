@@ -4,12 +4,17 @@ import type { DropzoneProps } from "@mantine/dropzone";
 import { Dropzone as MantineDropzone } from "@mantine/dropzone";
 import { filesize } from "filesize";
 
-type Props = Omit<DropzoneProps, "children">;
+type Props = Omit<DropzoneProps, "children"> & { fullscreen?: boolean };
 
 export default function Dropzone(props: Props) {
   const theme = useMantineTheme();
+
+  const DropzoneComponent = props.fullscreen
+    ? MantineDropzone.FullScreen
+    : MantineDropzone;
+
   return (
-    <MantineDropzone {...props}>
+    <DropzoneComponent {...props} active={props.fullscreen ? true : undefined}>
       <Group
         position="center"
         spacing="xl"
@@ -51,6 +56,6 @@ export default function Dropzone(props: Props) {
           </Text>
         </div>
       </Group>
-    </MantineDropzone>
+    </DropzoneComponent>
   );
 }
