@@ -8,7 +8,6 @@ const getUrl = (seed?: string) => uniqueNamesGenerator({ dictionaries: [adjectiv
 
 export const uploadHandler: UploadHandler = async ({ data, filename, name, contentType }) => {
   const url = getUrl();
-  console.log({ filename, url, name });
   const file = await db.file.create({ data: { name: filename!, url, mimeType: contentType } });
   const stream = await Storage.uploadStream(file.id, contentType);
   await writeAsyncIterableToWritable(data, stream.writeStream);

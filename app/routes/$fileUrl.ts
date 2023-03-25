@@ -1,9 +1,9 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { Storage } from "~/utils/storage.server";
 
-export const loader: LoaderFunction = async ({ params }) => {
+export async function loader({ params }: LoaderArgs) {
   try {
-    const file = await Storage.getFile(params.key!);
+    const file = await Storage.getFile(params.fileUrl!);
     const headers = new Headers();
     headers.set("Content-Type", "application/pdf");
     return new Response(file.Body?.transformToWebStream(), { headers });

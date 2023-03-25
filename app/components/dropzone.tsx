@@ -1,5 +1,5 @@
 import { Group, Text, useMantineTheme, rem } from "@mantine/core";
-import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
+import { IconUpload, IconX, IconFile } from "@tabler/icons-react";
 import type { DropzoneProps } from "@mantine/dropzone";
 import { Dropzone as MantineDropzone } from "@mantine/dropzone";
 import { filesize } from "filesize";
@@ -34,12 +34,12 @@ export default function Dropzone(props: Props) {
           />
         </MantineDropzone.Reject>
         <MantineDropzone.Idle>
-          <IconPhoto size="3.2rem" stroke={1.5} />
+          <IconFile size="3.2rem" stroke={1.5} />
         </MantineDropzone.Idle>
 
         <div>
           <Text size="xl" inline>
-            Drag images here or click to select files
+            Drag PDFs here or click to select files
           </Text>
           <Text size="sm" color="dimmed" inline mt={7}>
             Drop your file here

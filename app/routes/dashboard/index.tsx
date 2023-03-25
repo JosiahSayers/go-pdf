@@ -1,8 +1,7 @@
-import { useTheme } from "@emotion/react";
-import { Button, useMantineTheme } from "@mantine/core";
+import { useMantineTheme } from "@mantine/core";
 import type { FileWithPath } from "@mantine/dropzone";
 import { PDF_MIME_TYPE } from "@mantine/dropzone";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import { unstable_parseMultipartFormData } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
@@ -14,19 +13,19 @@ import { uploadHandler } from "~/utils/upload-handler";
 
 const TEN_MB = 1e7;
 
-export const loader: LoaderFunction = async () => {
+export async function loader() {
   const objects = await Storage.getAllObjects();
   return json({ existingObjects: objects ?? [] });
-};
+}
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   await unstable_parseMultipartFormData(request, uploadHandler);
   return null;
-};
+}
 
 export default function TestUpload() {
-  const { existingObjects } = useLoaderData();
-  const fetcher = useFetcher();
+  const { existingObjects } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher<typeof action>();
   const theme = useMantineTheme();
 
   const handleDrop = useCallback(
@@ -43,7 +42,7 @@ export default function TestUpload() {
   );
 
   const deleteFile = useCallback(
-    (fileUrl) => {
+    (fileUrl: string) => {
       fetcher.submit(
         {
           url: fileUrl,
@@ -69,6 +68,7 @@ export default function TestUpload() {
           maxFiles={1}
           multiple={false}
           name="file"
+          loading={fetcher.state !== "idle"}
         />
       </Form>
 
@@ -76,7 +76,7 @@ export default function TestUpload() {
       <ul>
         {existingObjects.map((obj) => (
           <li key={obj.id} style={{ display: "flex" }}>
-            <a href={`/get-contents/${obj.url}`}>{obj.name}</a>
+            <a href={`/${obj.url}`}>{obj.name}</a>
             <IconX
               size="1.5rem"
               stroke={1.5}
