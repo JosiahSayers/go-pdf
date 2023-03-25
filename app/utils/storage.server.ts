@@ -44,12 +44,12 @@ async function uploadStream(key: string, contentType: string) {
   }
 }
 
-async function deleteFile(fileUrl: string) {
+async function deleteFile(id: string) {
   try {
-    const file = await db.file.delete({ where: { url: fileUrl } });
+    const file = await db.file.delete({ where: { id } });
     return client.send(new DeleteObjectCommand({ Bucket, Key: file.id }));
   } catch (e) {
-    console.error('Error deleting file', { fileUrl, error: e });
+    console.error('Error deleting file', { fileUrl: id, error: e });
     throw e;
   }
 }
