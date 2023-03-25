@@ -1,17 +1,17 @@
 import {
   Anchor,
+  Button,
   Card,
   Collapse,
   Grid,
   Stack,
   Text,
-  TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { File } from "@prisma/client";
 import type { SerializeFrom } from "@remix-run/node";
-import { Link, useFetcher } from "@remix-run/react";
-import { IconFile } from "@tabler/icons-react";
+import { useFetcher } from "@remix-run/react";
+import { IconFileText } from "@tabler/icons-react";
 import { useCallback } from "react";
 import PdfCardDeleteButton from "~/components/dashbaord/pdf-card/delete-button";
 
@@ -20,11 +20,11 @@ interface Props {
 }
 
 export default function PdfCard({ file }: Props) {
-  const [show, { toggle }] = useDisclosure(true);
+  const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
 
   const deleteFile = useCallback(() => {
-    toggle();
+    close();
     fetcher.submit(
       {
         id: file.id,
@@ -34,16 +34,16 @@ export default function PdfCard({ file }: Props) {
         action: "/api/delete-file",
       }
     );
-  }, [fetcher, file, toggle]);
+  }, [fetcher, file, close]);
 
   return (
-    <Collapse in={show} transitionDuration={500}>
+    <Collapse in={opened} transitionDuration={500}>
       <Card shadow="sm" padding="lg" withBorder>
         <Grid align="center">
           <Grid.Col span="content">
-            <IconFile height={75} width={50} />
+            <IconFileText height={75} width={50} />
           </Grid.Col>
-          <Grid.Col span={6}>
+          <Grid.Col span={5}>
             <Stack ml="sm">
               <Text weight="bold" size="lg">
                 {file.name}
@@ -51,7 +51,28 @@ export default function PdfCard({ file }: Props) {
               <Anchor href={`/${file.url}`}>pdf.me/{file.url}</Anchor>
             </Stack>
           </Grid.Col>
-          <Grid.Col span="auto" />
+          <Grid.Col span="auto">
+            <Stack px="5rem">
+              <Button
+                compact
+                variant="subtle"
+                styles={{
+                  root: {
+                    width: "fit-content",
+                  },
+                }}
+              >
+                Analytics
+              </Button>
+              <Button
+                compact
+                variant="subtle"
+                styles={{ root: { width: "fit-content" } }}
+              >
+                Password Protection
+              </Button>
+            </Stack>
+          </Grid.Col>
           <Grid.Col span="content">
             <PdfCardDeleteButton onDelete={deleteFile} />
           </Grid.Col>

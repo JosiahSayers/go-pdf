@@ -61,7 +61,6 @@ export default function TestUpload() {
           <PdfCard file={obj} key={obj.id} />
         ))}
 
-        {fetcher.state !== "submitting" && <PdfCardSkeleton />}
         {fetcher.state === "submitting" && <PdfCardSkeleton />}
       </Stack>
     </>
