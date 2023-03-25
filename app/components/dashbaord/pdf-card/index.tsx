@@ -13,6 +13,7 @@ import type { SerializeFrom } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { IconFileText } from "@tabler/icons-react";
 import { useCallback } from "react";
+import { openContextModal } from "@mantine/modals";
 import PdfCardDeleteButton from "~/components/dashbaord/pdf-card/delete-button";
 
 interface Props {
@@ -22,6 +23,26 @@ interface Props {
 export default function PdfCard({ file }: Props) {
   const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
+
+  const openAnalyticsModal = () =>
+    openContextModal({
+      modal: "analytics",
+      title: `Analytics for ${file.name}`,
+      centered: true,
+      innerProps: {
+        modalBody: "Subscribe to unlock analytics",
+      },
+    });
+
+  const openPasswordProtectionModal = () =>
+    openContextModal({
+      modal: "passwordProtect",
+      title: `PDF Password Protection`,
+      centered: true,
+      innerProps: {
+        modalBody: "Subscribe to unlock password protection options",
+      },
+    });
 
   const deleteFile = useCallback(() => {
     close();
@@ -45,10 +66,10 @@ export default function PdfCard({ file }: Props) {
           </Grid.Col>
           <Grid.Col span={5}>
             <Stack ml="sm">
-              <Text weight="bold" size="lg">
-                {file.name}
-              </Text>
-              <Anchor href={`/${file.url}`}>pdf.me/{file.url}</Anchor>
+              <Text weight="bold">{file.name}</Text>
+              <Anchor size="sm" href={`/${file.url}`}>
+                pdf.me/{file.url}
+              </Anchor>
             </Stack>
           </Grid.Col>
           <Grid.Col span="auto">
@@ -61,6 +82,7 @@ export default function PdfCard({ file }: Props) {
                     width: "fit-content",
                   },
                 }}
+                onClick={openAnalyticsModal}
               >
                 Analytics
               </Button>
@@ -68,6 +90,7 @@ export default function PdfCard({ file }: Props) {
                 compact
                 variant="subtle"
                 styles={{ root: { width: "fit-content" } }}
+                onClick={openPasswordProtectionModal}
               >
                 Password Protection
               </Button>
