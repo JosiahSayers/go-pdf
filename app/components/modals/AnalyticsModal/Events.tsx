@@ -14,7 +14,7 @@ export default function AnalyticsModalEvents({ events }: Props) {
         <Text>All Time Views:</Text>
         <Group>
           <Badge>QR Code: {events.totalQrLoads}</Badge>
-          <Badge>Website: {events.totalWebsiteLoads}</Badge>
+          <Badge>Custom URL: {events.totalWebsiteLoads}</Badge>
         </Group>
       </Stack>
 

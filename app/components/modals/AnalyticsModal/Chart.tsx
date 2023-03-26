@@ -102,7 +102,7 @@ export default function AnalyticsModalChart({ events }: Props) {
         <Area
           type="monotone"
           dataKey="websiteLoads"
-          name="Website Loads"
+          name="Custom URL Loads"
           stroke="#82ca9d"
           fillOpacity={1}
           fill="url(#colorWebsite)"
