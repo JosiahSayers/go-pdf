@@ -12,6 +12,7 @@ import { ModalsProvider } from '@mantine/modals';
 import { StylesPlaceholder } from '@mantine/remix';
 import { theme } from '~/theme';
 import { definedModals } from '~/components/modals';
+import { Notifications } from '@mantine/notifications';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -24,6 +25,7 @@ createEmotionCache({ key: 'mantine' });
 export default function App() {
   return (
     <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+      <Notifications />
       <ModalsProvider modals={definedModals}>
         <html lang="en">
           <head>

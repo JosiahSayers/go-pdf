@@ -35,13 +35,13 @@ export default function PdfCard({ file }: Props) {
       },
     });
 
-  const openPasswordProtectionModal = () =>
+  const openEditModal = () =>
     openContextModal({
-      modal: 'passwordProtect',
-      title: `PDF Password Protection`,
+      modal: 'edit',
+      title: `Set custom URL`,
       centered: true,
       innerProps: {
-        modalBody: 'Subscribe to unlock password protection options',
+        file,
       },
     });
 
@@ -91,8 +91,8 @@ export default function PdfCard({ file }: Props) {
                 <PdfCardActionButton onClick={openAnalyticsModal}>
                   Analytics
                 </PdfCardActionButton>
-                <PdfCardActionButton onClick={openPasswordProtectionModal}>
-                  Password Protection
+                <PdfCardActionButton onClick={openEditModal}>
+                  Set Custom URL
                 </PdfCardActionButton>
                 <PdfCardActionButton onClick={openQrCodeModal}>
                   QR Code
