@@ -1,4 +1,12 @@
-import { Anchor, Card, Collapse, Grid, Stack, Text } from "@mantine/core";
+import {
+  Anchor,
+  Card,
+  Collapse,
+  Grid,
+  Group,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { File } from "@prisma/client";
 import type { SerializeFrom } from "@remix-run/node";
@@ -67,6 +75,7 @@ export default function PdfCard({ file }: Props) {
           <Grid.Col span="content">
             <IconFileText height={75} width={50} />
           </Grid.Col>
+
           <Grid.Col span={5}>
             <Stack ml="sm">
               <Text weight="bold">{file.name}</Text>
@@ -75,19 +84,23 @@ export default function PdfCard({ file }: Props) {
               </Anchor>
             </Stack>
           </Grid.Col>
+
           <Grid.Col span="auto">
-            <Stack px="5rem" spacing="xs">
-              <PdfCardActionButton onClick={openAnalyticsModal}>
-                Analytics
-              </PdfCardActionButton>
-              <PdfCardActionButton onClick={openPasswordProtectionModal}>
-                Password Protection
-              </PdfCardActionButton>
-              <PdfCardActionButton onClick={openQrCodeModal}>
-                QR Code
-              </PdfCardActionButton>
-            </Stack>
+            <Group position="right">
+              <Stack spacing="xs">
+                <PdfCardActionButton onClick={openAnalyticsModal}>
+                  Analytics
+                </PdfCardActionButton>
+                <PdfCardActionButton onClick={openPasswordProtectionModal}>
+                  Password Protection
+                </PdfCardActionButton>
+                <PdfCardActionButton onClick={openQrCodeModal}>
+                  QR Code
+                </PdfCardActionButton>
+              </Stack>
+            </Group>
           </Grid.Col>
+
           <Grid.Col span="content">
             <PdfCardDeleteButton onDelete={deleteFile} />
           </Grid.Col>

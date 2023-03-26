@@ -1,4 +1,4 @@
-import { Badge, Space, Stack, Text } from "@mantine/core";
+import { Badge, Group, Space, Stack, Text } from "@mantine/core";
 import type { SerializeFrom } from "@remix-run/node";
 import AnalyticsModalChart from "~/components/modals/AnalyticsModal/Chart";
 import type { loader } from "~/routes/api/analytics/$id";
@@ -10,8 +10,13 @@ interface Props {
 export default function AnalyticsModalEvents({ events }: Props) {
   return (
     <>
-      <Badge>All-Time QR Code Views: {events.totalQrLoads}</Badge>
-      <Badge>All-Time Website Views: {events.totalWebsiteLoads}</Badge>
+      <Stack>
+        <Text>All Time Views:</Text>
+        <Group>
+          <Badge>QR Code: {events.totalQrLoads}</Badge>
+          <Badge>Website: {events.totalWebsiteLoads}</Badge>
+        </Group>
+      </Stack>
 
       <Space h="lg" />
 

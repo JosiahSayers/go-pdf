@@ -32,7 +32,7 @@ export default function AnalyticsModal({
       {showEvents && <AnalyticsModalEvents events={fetcher.data!} />}
 
       <Button fullWidth mt="md" onClick={() => context.closeModal(id)}>
-        Close modal
+        Close
       </Button>
     </>
   );

@@ -11,10 +11,10 @@ export default function QrCodeModal({
   return (
     <>
       <Text size="sm">
-        This QR code links directly to your PDF when scanned. Download it, print
-        it, add it to your social media. This QR code will work as long as the
-        PDF is not deleted from PdfMe, even if you decide to change the URL or
-        update the PDF itself.
+        This QR code links directly to your PDF. Download it, print it, add it
+        to your social media. It code will work as long as the PDF is not
+        deleted from PdfMe, even if you decide to change the URL or update the
+        PDF itself.
       </Text>
 
       <Image src={url} />
