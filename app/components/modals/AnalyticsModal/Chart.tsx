@@ -46,6 +46,23 @@ export default function AnalyticsModalChart({ events }: Props) {
     );
   }, [events]);
 
+  const yAxisWidth = useMemo(() => {
+    let largest = 0;
+
+    data.forEach((date) => {
+      if (date.qrLoads > largest) {
+        largest = date.qrLoads;
+      }
+
+      if (date.websiteLoads > largest) {
+        largest = date.websiteLoads;
+      }
+    });
+
+    const length = largest.toString().length * 12;
+    return length < 30 ? 30 : length;
+  }, [data]);
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart
@@ -71,7 +88,7 @@ export default function AnalyticsModalChart({ events }: Props) {
           </linearGradient>
         </defs>
         <XAxis dataKey="date" />
-        <YAxis width={30} />
+        <YAxis width={yAxisWidth} />
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip />
         <Area
