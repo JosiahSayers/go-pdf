@@ -1,5 +1,5 @@
-import type { ContextModalProps } from "@mantine/modals";
-import { Button, Group, Image, Text } from "@mantine/core";
+import type { ContextModalProps } from '@mantine/modals';
+import { Button, Group, Image, Text } from '@mantine/core';
 
 export default function QrCodeModal({
   context,

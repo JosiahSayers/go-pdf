@@ -1,4 +1,4 @@
-import { Card, Group, Skeleton, Stack } from "@mantine/core";
+import { Card, Group, Skeleton, Stack } from '@mantine/core';
 
 export default function PdfCardSkeleton() {
   return (

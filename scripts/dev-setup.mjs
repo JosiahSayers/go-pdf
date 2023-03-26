@@ -5,7 +5,7 @@ import { paramCase } from 'change-case';
 
 const existingBuckets = await spinner('Logging in to cloudflare with wrangler', getBucketList);
 const chosenUserName = await getName();
-const bucketName = paramCase(`${chosenUserName} development`);
+const bucketName = paramCase(`${chosenUserName} pdfme development`);
 const accountId = await getAccountId();
 
 if (!existingBuckets.some(bucket => bucket.name === bucketName)) {

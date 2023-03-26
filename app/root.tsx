@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from '@remix-run/node';
 import {
   Links,
   LiveReload,
@@ -6,20 +6,20 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
-import { MantineProvider, createEmotionCache } from "@mantine/core";
-import { ModalsProvider } from "@mantine/modals";
-import { StylesPlaceholder } from "@mantine/remix";
-import { theme } from "~/theme";
-import { definedModals } from "~/components/modals";
+} from '@remix-run/react';
+import { MantineProvider, createEmotionCache } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import { StylesPlaceholder } from '@mantine/remix';
+import { theme } from '~/theme';
+import { definedModals } from '~/components/modals';
 
 export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "New Remix App",
-  viewport: "width=device-width,initial-scale=1",
+  charset: 'utf-8',
+  title: 'New Remix App',
+  viewport: 'width=device-width,initial-scale=1',
 });
 
-createEmotionCache({ key: "mantine" });
+createEmotionCache({ key: 'mantine' });
 
 export default function App() {
   return (

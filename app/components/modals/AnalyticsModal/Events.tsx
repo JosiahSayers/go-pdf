@@ -1,7 +1,7 @@
-import { Badge, Group, Space, Stack, Text } from "@mantine/core";
-import type { SerializeFrom } from "@remix-run/node";
-import AnalyticsModalChart from "~/components/modals/AnalyticsModal/Chart";
-import type { loader } from "~/routes/api/analytics/$id";
+import { Badge, Group, Space, Stack, Text } from '@mantine/core';
+import type { SerializeFrom } from '@remix-run/node';
+import AnalyticsModalChart from '~/components/modals/AnalyticsModal/Chart';
+import type { loader } from '~/routes/api/analytics/$id';
 
 interface Props {
   events: SerializeFrom<typeof loader>;

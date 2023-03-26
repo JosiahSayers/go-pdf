@@ -1,5 +1,5 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useMemo } from "react";
+import type { SerializeFrom } from '@remix-run/node';
+import { useMemo } from 'react';
 import {
   Area,
   AreaChart,
@@ -8,11 +8,11 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
-import type { loader } from "~/routes/api/analytics/$id";
+} from 'recharts';
+import type { loader } from '~/routes/api/analytics/$id';
 
 interface Props {
-  events?: SerializeFrom<typeof loader>["events"];
+  events?: SerializeFrom<typeof loader>['events'];
 }
 
 export default function AnalyticsModalChart({ events }: Props) {
@@ -32,12 +32,12 @@ export default function AnalyticsModalChart({ events }: Props) {
       if (indexOfDay === -1) {
         output.push({
           date: formattedDate,
-          qrLoads: event.event === "qr_code_view" ? 1 : 0,
-          websiteLoads: event.event === "view" ? 1 : 0,
+          qrLoads: event.event === 'qr_code_view' ? 1 : 0,
+          websiteLoads: event.event === 'view' ? 1 : 0,
         });
-      } else if (event.event === "qr_code_view") {
+      } else if (event.event === 'qr_code_view') {
         output[indexOfDay].qrLoads++;
-      } else if (event.event === "view") {
+      } else if (event.event === 'view') {
         output[indexOfDay].websiteLoads++;
       }
     });

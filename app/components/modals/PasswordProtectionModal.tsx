@@ -1,5 +1,5 @@
-import type { ContextModalProps } from "@mantine/modals";
-import { Button, Text } from "@mantine/core";
+import type { ContextModalProps } from '@mantine/modals';
+import { Button, Text } from '@mantine/core';
 
 export default function AnalyticsModal({
   context,

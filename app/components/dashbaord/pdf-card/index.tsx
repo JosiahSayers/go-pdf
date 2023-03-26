@@ -6,16 +6,16 @@ import {
   Group,
   Stack,
   Text,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import type { File } from "@prisma/client";
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
-import { IconFileText } from "@tabler/icons-react";
-import { useCallback } from "react";
-import { openContextModal } from "@mantine/modals";
-import PdfCardDeleteButton from "~/components/dashbaord/pdf-card/delete-button";
-import PdfCardActionButton from "~/components/dashbaord/pdf-card/action-button";
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import type { File } from '@prisma/client';
+import type { SerializeFrom } from '@remix-run/node';
+import { useFetcher } from '@remix-run/react';
+import { IconFileText } from '@tabler/icons-react';
+import { useCallback } from 'react';
+import { openContextModal } from '@mantine/modals';
+import PdfCardDeleteButton from '~/components/dashbaord/pdf-card/delete-button';
+import PdfCardActionButton from '~/components/dashbaord/pdf-card/action-button';
 
 interface Props {
   file: SerializeFrom<File>;
@@ -27,7 +27,7 @@ export default function PdfCard({ file }: Props) {
 
   const openAnalyticsModal = () =>
     openContextModal({
-      modal: "analytics",
+      modal: 'analytics',
       title: `Analytics for ${file.name}`,
       centered: true,
       innerProps: {
@@ -37,18 +37,18 @@ export default function PdfCard({ file }: Props) {
 
   const openPasswordProtectionModal = () =>
     openContextModal({
-      modal: "passwordProtect",
+      modal: 'passwordProtect',
       title: `PDF Password Protection`,
       centered: true,
       innerProps: {
-        modalBody: "Subscribe to unlock password protection options",
+        modalBody: 'Subscribe to unlock password protection options',
       },
     });
 
   const openQrCodeModal = () =>
     openContextModal({
-      modal: "qrCode",
-      title: "Get A QR Code",
+      modal: 'qrCode',
+      title: 'Get A QR Code',
       centered: true,
       innerProps: {
         fileId: file.id,
@@ -62,8 +62,8 @@ export default function PdfCard({ file }: Props) {
         id: file.id,
       },
       {
-        method: "delete",
-        action: "/api/delete-file",
+        method: 'delete',
+        action: '/api/delete-file',
       }
     );
   }, [fetcher, file, close]);

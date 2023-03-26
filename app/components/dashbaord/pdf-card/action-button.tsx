@@ -1,5 +1,5 @@
-import { Button } from "@mantine/core";
-import type { PropsWithChildren } from "react";
+import { Button } from '@mantine/core';
+import type { PropsWithChildren } from 'react';
 
 interface Props extends PropsWithChildren {
   onClick: () => void;
@@ -11,7 +11,7 @@ export default function PdfCardActionButton({ onClick, children }: Props) {
     <Button
       compact
       variant="subtle"
-      styles={{ root: { width: "fit-content" } }}
+      styles={{ root: { width: 'fit-content' } }}
       onClick={onClick}
     >
       {children}

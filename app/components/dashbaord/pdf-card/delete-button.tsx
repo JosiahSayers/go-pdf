@@ -1,7 +1,7 @@
-import { useMantineTheme, Text, Button } from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMantineTheme, Text, Button } from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { IconX } from '@tabler/icons-react';
+import { useState } from 'react';
 
 interface Props {
   onDelete: () => void;
@@ -13,7 +13,7 @@ export default function PdfCardDeleteButton({ onDelete }: Props) {
 
   const openDeleteModal = () =>
     modals.openConfirmModal({
-      title: "Delete this PDF",
+      title: 'Delete this PDF',
       centered: true,
       children: (
         <Text>
@@ -21,8 +21,8 @@ export default function PdfCardDeleteButton({ onDelete }: Props) {
           codes will stop working. This action cannot be reversed.
         </Text>
       ),
-      labels: { confirm: "Delete PDF", cancel: "No don't delete it" },
-      confirmProps: { color: "red" },
+      labels: { confirm: 'Delete PDF', cancel: "No don't delete it" },
+      confirmProps: { color: 'red' },
       onConfirm: () => onDelete(),
     });
 
@@ -41,7 +41,7 @@ export default function PdfCardDeleteButton({ onDelete }: Props) {
         color={
           hovered
             ? theme.colors.red[6]
-            : theme.colors.red[theme.colorScheme === "dark" ? 2 : 4]
+            : theme.colors.red[theme.colorScheme === 'dark' ? 2 : 4]
         }
       />
     </Button>

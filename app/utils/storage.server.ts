@@ -1,7 +1,11 @@
 import { PassThrough } from 'stream';
 import aws from 'aws-sdk';
-import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { db } from "~/utils/db.server";
+import {
+  S3Client,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+import { db } from '~/utils/db.server';
 
 const client = new S3Client({
   region: 'auto',
@@ -9,7 +13,7 @@ const client = new S3Client({
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY_ID!,
     secretAccessKey: process.env.R2_ACCESS_KEY!,
-  }
+  },
 });
 const Bucket = process.env.R2_BUCKET!;
 
@@ -34,7 +38,9 @@ async function getFile({ fileUrl, id }: GetFileParams) {
     }
     return {
       file,
-      fileStore: await client.send(new GetObjectCommand({ Bucket, Key: file.id }))
+      fileStore: await client.send(
+        new GetObjectCommand({ Bucket, Key: file.id })
+      ),
     };
   } catch (e) {
     console.error('Error getting file from bucket', { fileUrl, error: e });
@@ -49,15 +55,17 @@ async function uploadStream(key: string, contentType: string) {
     credentials: {
       accessKeyId: process.env.R2_ACCESS_KEY_ID!,
       secretAccessKey: process.env.R2_ACCESS_KEY!,
-    }
+    },
   });
 
   const pass = new PassThrough();
-  
+
   return {
     writeStream: pass,
-    promise: s3.upload({ Bucket, Key: key, Body: pass, ContentType: contentType }).promise()
-  }
+    promise: s3
+      .upload({ Bucket, Key: key, Body: pass, ContentType: contentType })
+      .promise(),
+  };
 }
 
 async function deleteFile(id: string) {

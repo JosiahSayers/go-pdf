@@ -1,6 +1,6 @@
-import type { ActionFunction} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Storage } from "~/utils/storage.server";
+import type { ActionFunction } from '@remix-run/node';
+import { json } from '@remix-run/node';
+import { Storage } from '~/utils/storage.server';
 
 export const action: ActionFunction = async ({ request }) => {
   const fileId = (await request.formData()).get('id');

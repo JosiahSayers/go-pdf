@@ -1,4 +1,4 @@
-import { Group, Skeleton, Stack } from "@mantine/core";
+import { Group, Skeleton, Stack } from '@mantine/core';
 
 export default function AnalyticsModalSkeleton() {
   return (
