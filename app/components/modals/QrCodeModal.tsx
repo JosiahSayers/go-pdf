@@ -16,7 +16,9 @@ export default function QrCodeModal({
         PDF is not deleted from PdfMe, even if you decide to change the URL or
         update the PDF itself.
       </Text>
+
       <Image src={url} />
+
       <Group position="right">
         <Button component="a" mt="md" download href={url}>
           Download

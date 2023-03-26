@@ -1,12 +1,4 @@
-import {
-  Anchor,
-  Button,
-  Card,
-  Collapse,
-  Grid,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Anchor, Card, Collapse, Grid, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { File } from "@prisma/client";
 import type { SerializeFrom } from "@remix-run/node";
@@ -31,7 +23,7 @@ export default function PdfCard({ file }: Props) {
       title: `Analytics for ${file.name}`,
       centered: true,
       innerProps: {
-        modalBody: "Subscribe to unlock analytics",
+        fileId: file.id,
       },
     });
 
