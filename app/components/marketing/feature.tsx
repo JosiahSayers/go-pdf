@@ -8,8 +8,8 @@ interface Props extends PropsWithChildren {
 export default function MarketingFeature({ title, children }: Props) {
   return (
     <Grid.Col sm={4} xs={12}>
-      <Stack mih={300}>
-        <Title order={4} mih={65}>
+      <Stack mih={250}>
+        <Title order={4} mih={55}>
           {title}
         </Title>
         <Text>{children}</Text>

@@ -30,7 +30,7 @@ export default function PdfHosting() {
       <Grid grow>
         <Grid.Col span={4}>
           <Stack>
-            <Title order={3}>PDF Hosting, made easy</Title>
+            <Title order={3}>PDF Hosting, Made Easy</Title>
             <Text>
               Getting a hosting provider setup can be complicated, we think that
               sucks. PdfMe is the easiest way to upload and share your PDF
@@ -54,7 +54,7 @@ export default function PdfHosting() {
       <Grid>
         <MarketingFeature title="Low Cost, High Performance">
           We're powered by CloudFlare which lets us offer you competitive prices
-          while tapping into the performance of a worldwide storage provider.
+          while tapping into the speed of a worldwide storage provider.
         </MarketingFeature>
 
         <MarketingFeature title="Breezy PDF Uploading">
@@ -68,10 +68,14 @@ export default function PdfHosting() {
           their menu with patrons.
         </MarketingFeature>
 
-        <MarketingFeature title="Free Shareable Web Address">
-          Each PDF you upload will be given a random web address. If you don't
-          like what we generated you're free to change it as many times as you
-          want.
+        <MarketingFeature title="Free Shareable Link">
+          Each PDF you upload will be given a random link. If you don't like
+          what we generated you're free to change it as many times as you want.
+        </MarketingFeature>
+
+        <MarketingFeature title="Analytics & Insights">
+          See how often your PDF is being viewed with analytics built in to the
+          platform.
         </MarketingFeature>
       </Grid>
 
