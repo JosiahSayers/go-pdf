@@ -3,12 +3,15 @@
 import { $, spinner, question, chalk, fs } from 'zx';
 import { paramCase } from 'change-case';
 
-const existingBuckets = await spinner('Logging in to cloudflare with wrangler', getBucketList);
+const existingBuckets = await spinner(
+  'Logging in to cloudflare with wrangler',
+  getBucketList
+);
 const chosenUserName = await getName();
 const bucketName = paramCase(`${chosenUserName} pdfme development`);
 const accountId = await getAccountId();
 
-if (!existingBuckets.some(bucket => bucket.name === bucketName)) {
+if (!existingBuckets.some((bucket) => bucket.name === bucketName)) {
   await $`wrangler r2 bucket create ${bucketName}`;
 }
 
@@ -22,7 +25,6 @@ await checkAccessKeys();
 
 console.log(chalk.green('All done!'));
 
-
 // FUNCTIONS
 async function getBucketList() {
   let bucketList;
@@ -32,7 +34,9 @@ async function getBucketList() {
   } catch (e) {
     await $`wrangler login`;
   }
-  return bucketList ? JSON.parse(bucketList) : JSON.parse(await bucketListCommand());
+  return bucketList
+    ? JSON.parse(bucketList)
+    : JSON.parse(await bucketListCommand());
 }
 
 async function getAccountId() {
@@ -44,9 +48,14 @@ async function getAccountId() {
 async function getName() {
   let gitUserName = await $`git config user.name`.quiet();
   gitUserName = gitUserName.toString().trim();
-  const userNameInput = await question(gitUserName ? `What is your name? [default ${gitUserName}]: ` : 'What is your name?: ');
-  const chosenUserName = userNameInput.trim().length > 0 ? userNameInput : gitUserName;
-  
+  const userNameInput = await question(
+    gitUserName
+      ? `What is your name? [default ${gitUserName}]: `
+      : 'What is your name?: '
+  );
+  const chosenUserName =
+    userNameInput.trim().length > 0 ? userNameInput : gitUserName;
+
   if (chosenUserName.length === 0) {
     console.log(chalk.red('A name must be provided'));
     await $`exit 1`;
@@ -81,10 +90,12 @@ async function doesEnvVarExist(envVar) {
 async function checkAccessKeys() {
   const { exists: keyIdExists } = await doesEnvVarExist('R2_ACCESS_KEY_ID');
   const { exists: keyExists } = await doesEnvVarExist('R2_ACCESS_KEY');
-  
+
   if (!keyIdExists || !keyExists) {
     console.log(`Now, let's get your API access key created`);
-    console.log(`Opening a browser to cloudflare, please follow the instructions here to create a new key: https://developers.cloudflare.com/r2/api/s3/tokens/`);
+    console.log(
+      `Opening a browser to cloudflare, please follow the instructions here to create a new key: https://developers.cloudflare.com/r2/api/s3/tokens/`
+    );
     await $`open https://dash.cloudflare.com/${accountId}/r2/overview/api-tokens`.quiet();
     const keyId = await question('Access Key ID: ');
     const key = await question('Access Key: ');
