@@ -9,7 +9,6 @@ import { useCallback } from 'react';
 import PdfCard from '~/components/dashbaord/pdf-card';
 import PdfCardSkeleton from '~/components/dashbaord/pdf-card/skeleton';
 import Dropzone from '~/components/dropzone';
-import type { ClientFile } from '~/models/client-file';
 import { Storage } from '~/utils/storage.server';
 import { uploadHandler } from '~/utils/upload-handler';
 
@@ -17,14 +16,7 @@ const TEN_MB = 1e7;
 
 export async function loader() {
   const objects = await Storage.getAllObjects();
-  const mappedForClient: ClientFile[] = objects.map((f) => {
-    const { password, ...rest } = f;
-    return {
-      ...rest,
-      isPasswordProtected: !!password,
-    };
-  });
-  return json({ existingObjects: mappedForClient });
+  return json({ existingObjects: objects ?? [] });
 }
 
 export async function action({ request }: ActionArgs) {

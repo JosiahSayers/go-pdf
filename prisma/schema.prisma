@@ -22,7 +22,6 @@ model File {
   name      String
   url       String   @unique
   mimeType  String
-  password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
