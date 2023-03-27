@@ -6,6 +6,7 @@ import {
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { db } from '~/utils/db.server';
+import { Password } from '~/utils/password.server';
 
 const client = new S3Client({
   region: 'auto',
@@ -17,25 +18,42 @@ const client = new S3Client({
 });
 const Bucket = process.env.R2_BUCKET!;
 
+export class IncorrectPasswordError extends Error {}
+
 interface GetFileByUrlParams {
   fileUrl: string;
-  id?: undefined;
+  id: undefined;
 }
 
 interface GetFileByIdParams {
   id: string;
-  fileUrl?: undefined;
+  fileUrl: undefined;
 }
 
-type GetFileParams = GetFileByUrlParams | GetFileByIdParams;
+interface BaseGetFileParams {
+  password?: string;
+}
 
-async function getFile({ fileUrl, id }: GetFileParams) {
+type GetFileParams = (GetFileByUrlParams | GetFileByIdParams) &
+  BaseGetFileParams;
+
+async function getFile({ fileUrl, id, password }: GetFileParams) {
   try {
     const where = fileUrl ? { url: fileUrl } : { id };
     const file = await db.file.findUnique({ where });
     if (!file) {
       throw new Error(`Unable to find file in database`);
     }
+
+    if (file.password) {
+      const suppliedPassword = !!password;
+      const isPasswordCorrect =
+        suppliedPassword && (await Password.compare(file.password, password));
+      if (!isPasswordCorrect) {
+        throw new IncorrectPasswordError();
+      }
+    }
+
     return {
       file,
       fileStore: await client.send(
@@ -43,7 +61,26 @@ async function getFile({ fileUrl, id }: GetFileParams) {
       ),
     };
   } catch (e) {
-    console.error('Error getting file from bucket', { fileUrl, error: e });
+    console.error('Error getting file from bucket', { fileUrl, id, error: e });
+    throw e;
+  }
+}
+
+async function isFilePasswordProtected({ fileUrl, id }: GetFileParams) {
+  try {
+    const where = fileUrl ? { url: fileUrl } : { id };
+    const dbRes = await db.file.findUnique({
+      where,
+      select: { password: true },
+    });
+
+    return !!dbRes?.password;
+  } catch (e) {
+    console.error('Error checking if file is password protected', {
+      fileUrl,
+      id,
+      error: e,
+    });
     throw e;
   }
 }
@@ -68,6 +105,21 @@ async function uploadStream(key: string, contentType: string) {
   };
 }
 
+async function updateFilePassword(fileId: string, newPassword: string | null) {
+  try {
+    let passwordToSet = newPassword;
+    if (newPassword) {
+      passwordToSet = await Password.hash(newPassword);
+    }
+    await db.file.update({
+      where: { id: fileId },
+      data: { password: passwordToSet },
+    });
+  } catch (e) {
+    console.error('Error updating file password', { fileId, error: e });
+  }
+}
+
 async function deleteFile(id: string) {
   try {
     const file = await db.file.delete({ where: { id } });
@@ -90,6 +142,8 @@ async function getAllObjects() {
 export const Storage = {
   deleteFile,
   getFile,
+  isFilePasswordProtected,
+  updateFilePassword,
   uploadStream,
   getAllObjects,
 };

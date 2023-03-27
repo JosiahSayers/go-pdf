@@ -8,7 +8,6 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import type { File } from '@prisma/client';
 import type { SerializeFrom } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { IconFileText } from '@tabler/icons-react';
@@ -16,9 +15,10 @@ import { useCallback } from 'react';
 import { openContextModal } from '@mantine/modals';
 import PdfCardDeleteButton from '~/components/dashbaord/pdf-card/delete-button';
 import PdfCardActionButton from '~/components/dashbaord/pdf-card/action-button';
+import type { ClientFile } from '~/models/client-file';
 
 interface Props {
-  file: SerializeFrom<File>;
+  file: SerializeFrom<ClientFile>;
 }
 
 export default function PdfCard({ file }: Props) {
@@ -52,6 +52,16 @@ export default function PdfCard({ file }: Props) {
       centered: true,
       innerProps: {
         fileId: file.id,
+      },
+    });
+
+  const openPasswordModal = () =>
+    openContextModal({
+      modal: 'password',
+      title: file.isPasswordProtected ? 'Update Password' : 'Set Password',
+      centered: true,
+      innerProps: {
+        file,
       },
     });
 
@@ -91,11 +101,21 @@ export default function PdfCard({ file }: Props) {
                 <PdfCardActionButton onClick={openAnalyticsModal}>
                   Analytics
                 </PdfCardActionButton>
+                <PdfCardActionButton onClick={openQrCodeModal}>
+                  QR Code
+                </PdfCardActionButton>
+              </Stack>
+            </Group>
+          </Grid.Col>
+
+          <Grid.Col span="auto">
+            <Group position="right">
+              <Stack spacing="xs">
                 <PdfCardActionButton onClick={openEditModal}>
                   Set Custom URL
                 </PdfCardActionButton>
-                <PdfCardActionButton onClick={openQrCodeModal}>
-                  QR Code
+                <PdfCardActionButton onClick={openPasswordModal}>
+                  {`${file.isPasswordProtected ? 'Update' : 'Set'} Password`}
                 </PdfCardActionButton>
               </Stack>
             </Group>
