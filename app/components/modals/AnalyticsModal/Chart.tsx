@@ -1,4 +1,5 @@
 import type { SerializeFrom } from '@remix-run/node';
+import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import {
   Area,
@@ -16,22 +17,31 @@ interface Props {
 }
 
 export default function AnalyticsModalChart({ events }: Props) {
+  const lastTenDays = useMemo(() => {
+    const today = DateTime.now();
+    const output: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      const date = today.minus({ days: i });
+      output.push(date.toLocaleString());
+    }
+    return output;
+  }, []);
+
   const data = useMemo(() => {
     const output: Array<{
       date: string;
       qrLoads: number;
       websiteLoads: number;
-    }> = [];
+    }> = lastTenDays.map((date) => ({ date, qrLoads: 0, websiteLoads: 0 }));
 
     events?.forEach((event) => {
-      const date = new Date(event.createdAt);
-      const formattedDate = `${
-        date.getMonth() + 1
-      }/${date.getDate()}/${date.getFullYear()}`;
-      const indexOfDay = output.findIndex((x) => x.date === formattedDate);
+      const date = DateTime.fromISO(event.createdAt);
+      const indexOfDay = output.findIndex(
+        (x) => x.date === date.toLocaleString()
+      );
       if (indexOfDay === -1) {
         output.push({
-          date: formattedDate,
+          date: date.toLocaleString(),
           qrLoads: event.event === 'qr_code_view' ? 1 : 0,
           websiteLoads: event.event === 'view' ? 1 : 0,
         });
@@ -44,7 +54,7 @@ export default function AnalyticsModalChart({ events }: Props) {
     return output.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-  }, [events]);
+  }, [events, lastTenDays]);
 
   const yAxisWidth = useMemo(() => {
     let largest = 0;
