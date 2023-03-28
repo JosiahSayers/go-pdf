@@ -13,6 +13,7 @@ import { StylesPlaceholder } from '@mantine/remix';
 import { theme } from '~/theme';
 import { definedModals } from '~/components/modals';
 import { Notifications } from '@mantine/notifications';
+import Footer from '~/components/footer';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
