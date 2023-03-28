@@ -16,6 +16,7 @@ import { useCallback } from 'react';
 import { openContextModal } from '@mantine/modals';
 import PdfCardDeleteButton from '~/components/dashboard/pdf-card/delete-button';
 import PdfCardActionButton from '~/components/dashboard/pdf-card/action-button';
+import { useCsrf } from '~/components/context/csrf';
 
 interface Props {
   file: SerializeFrom<File>;
@@ -24,6 +25,7 @@ interface Props {
 export default function PdfCard({ file }: Props) {
   const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
+  const csrf = useCsrf();
 
   const openAnalyticsModal = () =>
     openContextModal({
@@ -60,13 +62,14 @@ export default function PdfCard({ file }: Props) {
     fetcher.submit(
       {
         id: file.id,
+        csrf,
       },
       {
         method: 'delete',
         action: '/api/delete-file',
       }
     );
-  }, [fetcher, file, close]);
+  }, [fetcher, file, close, csrf]);
 
   return (
     <Collapse in={opened} transitionDuration={500}>

@@ -8,6 +8,7 @@ import { editPdfValidator } from '~/routes/api/edit/$id';
 import ValidatedTextInput from '~/components/ValidatedTextInput';
 import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
+import { useCsrf } from '~/components/context/csrf';
 
 export default function AnalyticsModal({
   context,
@@ -15,6 +16,7 @@ export default function AnalyticsModal({
   innerProps,
 }: ContextModalProps<{ file: SerializeFrom<File> }>) {
   const fetcher = useFetcher();
+  const csrf = useCsrf();
 
   useEffect(() => {
     if (fetcher.data?.success) {
@@ -46,6 +48,7 @@ export default function AnalyticsModal({
             name="url"
             disabled={fetcher.state === 'submitting'}
           />
+          <input type="hidden" defaultValue={csrf} name="csrf" />
 
           {fetcher.state === 'idle' && fetcher.data?.success && (
             <Alert title="Saved!" color="green">

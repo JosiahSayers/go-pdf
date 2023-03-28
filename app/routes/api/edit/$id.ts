@@ -4,6 +4,7 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 import { z } from 'zod';
 import { db } from '~/utils/db.server';
+import { Session } from '~/utils/session.server';
 
 export const editPdfSchema = z.object({
   url: z
@@ -14,6 +15,7 @@ export const editPdfSchema = z.object({
 export const editPdfValidator = withZod(editPdfSchema);
 
 export async function action({ request, params }: ActionArgs) {
+  await Session.validateCsrf(request);
   const result = await editPdfValidator.validate(await request.formData());
   if (result.error) {
     return validationError(result.error);
