@@ -17,17 +17,10 @@ const client = new S3Client({
 });
 const Bucket = process.env.R2_BUCKET!;
 
-interface GetFileByUrlParams {
-  fileUrl: string;
-  id?: undefined;
+export interface GetFileParams {
+  fileUrl?: string;
+  id?: string;
 }
-
-interface GetFileByIdParams {
-  id: string;
-  fileUrl?: undefined;
-}
-
-type GetFileParams = GetFileByUrlParams | GetFileByIdParams;
 
 async function getFile({ fileUrl, id }: GetFileParams) {
   try {
