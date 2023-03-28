@@ -22,6 +22,8 @@ export const uploadHandler: UploadHandler = async ({
   name,
   contentType,
 }) => {
+  if (name !== 'file') return;
+
   const url = getUrl();
   const file = await db.file.create({
     data: { name: filename!, url, mimeType: contentType },

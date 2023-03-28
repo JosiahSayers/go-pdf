@@ -6,9 +6,11 @@ import { unstable_parseMultipartFormData } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
 import { useCallback } from 'react';
+import { useCsrf } from '~/components/context/csrf';
 import PdfCard from '~/components/dashboard/pdf-card';
 import PdfCardSkeleton from '~/components/dashboard/pdf-card/skeleton';
 import Dropzone from '~/components/dropzone';
+import { Session } from '~/utils/session.server';
 import { Storage } from '~/utils/storage.server';
 import { uploadHandler } from '~/utils/upload-handler';
 
@@ -20,11 +22,13 @@ export async function loader() {
 }
 
 export async function action({ request }: ActionArgs) {
+  await Session.validateCsrf(request);
   await unstable_parseMultipartFormData(request, uploadHandler);
   return null;
 }
 
-export default function TestUpload() {
+export default function Dashboard() {
+  const csrf = useCsrf();
   const { existingObjects } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
 
@@ -33,12 +37,13 @@ export default function TestUpload() {
       console.log(newFile);
       const formData = new FormData();
       formData.append('file', newFile[0]);
+      formData.append('csrf', csrf);
       fetcher.submit(formData, {
         method: 'post',
         encType: 'multipart/form-data',
       });
     },
-    [fetcher]
+    [fetcher, csrf]
   );
 
   return (
