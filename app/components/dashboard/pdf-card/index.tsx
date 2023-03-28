@@ -14,8 +14,8 @@ import { useFetcher } from '@remix-run/react';
 import { IconFileText } from '@tabler/icons-react';
 import { useCallback } from 'react';
 import { openContextModal } from '@mantine/modals';
-import PdfCardDeleteButton from '~/components/dashbaord/pdf-card/delete-button';
-import PdfCardActionButton from '~/components/dashbaord/pdf-card/action-button';
+import PdfCardDeleteButton from '~/components/dashboard/pdf-card/delete-button';
+import PdfCardActionButton from '~/components/dashboard/pdf-card/action-button';
 
 interface Props {
   file: SerializeFrom<File>;

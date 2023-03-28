@@ -1,7 +1,7 @@
 import { AppShell } from '@mantine/core';
 import { json } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
-import Header from '~/components/dashbaord/header';
+import Header from '~/components/dashboard/header';
 
 export async function loader() {
   return json({ user: { name: 'John Smith' } });
