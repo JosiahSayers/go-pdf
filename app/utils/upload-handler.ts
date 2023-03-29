@@ -18,11 +18,12 @@ const getUrl = (seed?: string) =>
 
 export class FileTooLargeError extends Error {}
 
-const TEN_MB = 1e7;
+const ONE_MB = 1e6;
+const ONE_HUNDRED_MB = 1e8;
 
 const createUploadHandler = async ({
   namesOfFile = 'file',
-  maxSize = TEN_MB,
+  maxSize = ONE_MB,
 } = {}) => {
   const fileRecord = await db.file.create({ data: { url: getUrl() } });
   const uploadHandler: UploadHandler = async ({
@@ -71,5 +72,6 @@ const createUploadHandler = async ({
 export const Uploads = {
   getUrl,
   createUploadHandler,
-  TEN_MB,
+  ONE_MB,
+  ONE_HUNDRED_MB,
 };

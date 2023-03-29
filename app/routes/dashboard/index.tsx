@@ -19,7 +19,7 @@ import { filesize } from 'filesize';
 
 export async function loader() {
   const objects = await Storage.getAllObjects();
-  const maxSize = Uploads.TEN_MB;
+  const maxSize = Uploads.ONE_MB;
   return json({ existingObjects: objects ?? [], maxSize });
 }
 

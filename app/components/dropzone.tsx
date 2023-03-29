@@ -49,9 +49,7 @@ export default function Dropzone(props: Props) {
           <Text size="sm" color="dimmed" inline mt={7}>
             Drop your file here
             {props.maxSize
-              ? `, it should not exceed ${filesize(props.maxSize, {
-                  spacer: '',
-                })}`
+              ? `, it should not exceed ${filesize(props.maxSize)}`
               : ''}
           </Text>
         </div>
