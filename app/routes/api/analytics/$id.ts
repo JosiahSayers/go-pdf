@@ -13,7 +13,11 @@ export async function loader({ params, request }: LoaderArgs) {
     db.fileEvent.count({ where: { fileId: params.id, event: 'qr_code_view' } }),
     db.fileEvent.count({ where: { fileId: params.id, event: 'view' } }),
     db.fileEvent.findMany({
-      where: { fileId: params.id, createdAt: { gte: tenDaysAgo.toJSDate() } },
+      where: {
+        fileId: params.id,
+        createdAt: { gte: tenDaysAgo.toJSDate() },
+        event: { in: ['qr_code_view', 'view'] },
+      },
       select: { event: true, createdAt: true },
     }),
   ]);

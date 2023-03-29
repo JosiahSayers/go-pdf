@@ -49,6 +49,7 @@ model File {
 enum FileEvents {
   view
   qr_code_view
+  url_update
 }
 
 model FileEvent {

@@ -44,9 +44,14 @@ export async function action({ request, params }: ActionArgs) {
     });
   }
 
-  await db.file.update({
-    where: { id: params.id },
-    data: { url: result.data.url },
-  });
+  await db.$transaction([
+    db.file.update({
+      where: { id: params.id },
+      data: { url: result.data.url },
+    }),
+    db.fileEvent.create({
+      data: { fileId: file.id, event: 'url_update' },
+    }),
+  ]);
   return json({ success: true });
 }
