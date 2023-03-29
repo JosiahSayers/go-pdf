@@ -42,6 +42,20 @@ export default function Index() {
             Login
           </a>
         </li>
+        <li>
+          <a
+            onClick={() =>
+              openContextModal({
+                modal: 'register',
+                title: 'Register',
+                centered: true,
+                innerProps: {},
+              })
+            }
+          >
+            Register
+          </a>
+        </li>
       </ul>
     </div>
   );

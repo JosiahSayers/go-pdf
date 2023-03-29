@@ -19,19 +19,7 @@ export async function action({ request }: ActionArgs) {
   if (form.error) {
     return validationError(form.error);
   }
-  // const createRes = await db.user.create({
-  //   data: {
-  //     email: form.data.email,
-  //     password: await Password.hash(form.data.password),
-  //     profile: {
-  //       create: {
-  //         name: 'John Smith',
-  //         company: 'Microsoft',
-  //       },
-  //     },
-  //   },
-  // });
-  // console.log(createRes);
+
   const user = await db.user.findUnique({
     where: { email: form.data.email },
     include: { profile: true },
@@ -43,10 +31,11 @@ export async function action({ request }: ActionArgs) {
   if (!user || !isPasswordCorrect) {
     return json({ error: 'Unable to log you in' });
   }
+
   session.set('userId', user.id);
   session.set('name', user.profile?.name);
   return json(
-    { success: true },
+    { success: true, name: user.profile?.name },
     { headers: await Session.headersWithSession(session) }
   );
 }
