@@ -120,7 +120,7 @@ export default function Dashboard() {
           <PdfCard file={obj} key={obj.id} />
         ))}
 
-        {fetcher.state === 'submitting' && <PdfCardSkeleton />}
+        {fetcher.state !== 'idle' && <PdfCardSkeleton />}
       </Stack>
     </>
   );
