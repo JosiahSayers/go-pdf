@@ -6,7 +6,8 @@
     "dev": "remix dev",
     "dev:setup": "zx ./scripts/dev-setup.mjs",
     "lint": "eslint --ext ts --ext tsx app",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.298.0",
