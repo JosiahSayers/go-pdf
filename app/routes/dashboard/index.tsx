@@ -1,36 +1,66 @@
 import { Space, Stack } from '@mantine/core';
 import type { FileWithPath } from '@mantine/dropzone';
+import type { FileRejection } from 'react-dropzone';
 import { PDF_MIME_TYPE } from '@mantine/dropzone';
+import { notifications } from '@mantine/notifications';
 import type { ActionArgs } from '@remix-run/node';
 import { unstable_parseMultipartFormData } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useCsrf } from '~/components/context/csrf';
 import PdfCard from '~/components/dashboard/pdf-card';
 import PdfCardSkeleton from '~/components/dashboard/pdf-card/skeleton';
 import Dropzone from '~/components/dropzone';
 import { Session } from '~/utils/session.server';
 import { Storage } from '~/utils/storage.server';
-import { uploadHandler } from '~/utils/upload-handler';
-
-const TEN_MB = 1e7;
+import { FileTooLargeError, Uploads } from '~/utils/upload-handler';
+import { filesize } from 'filesize';
 
 export async function loader() {
   const objects = await Storage.getAllObjects();
-  return json({ existingObjects: objects ?? [] });
+  const maxSize = Uploads.TEN_MB;
+  return json({ existingObjects: objects ?? [], maxSize });
 }
 
 export async function action({ request }: ActionArgs) {
   await Session.validateCsrf(request);
-  await unstable_parseMultipartFormData(request, uploadHandler);
+  try {
+    const uploadHandler = await Uploads.createUploadHandler();
+    await unstable_parseMultipartFormData(request, uploadHandler);
+  } catch (e) {
+    if (e instanceof FileTooLargeError) {
+      return json({ error: 'File is too large' });
+    }
+    return json({
+      error: 'Unexpected error, please try again in a little bit.',
+    });
+  }
+
   return null;
 }
 
 export default function Dashboard() {
   const csrf = useCsrf();
-  const { existingObjects } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<typeof action>();
+  const { existingObjects, maxSize } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+
+  const showErrorNotification = useCallback(
+    (message: string, title = 'Error') =>
+      notifications.show({
+        title,
+        message,
+        color: 'red',
+        autoClose: 10000,
+      }),
+    []
+  );
+
+  useEffect(() => {
+    if (fetcher.data?.error) {
+      showErrorNotification(fetcher.data.error);
+    }
+  }, [fetcher.data, showErrorNotification]);
 
   const handleDrop = useCallback(
     (newFile: FileWithPath[]) => {
@@ -45,13 +75,32 @@ export default function Dashboard() {
     [fetcher, csrf]
   );
 
+  const handleReject = useCallback(
+    (fileRejections: FileRejection[]) => {
+      console.log(fileRejections);
+      fileRejections.forEach((file) => {
+        const errorMessage =
+          file.errors[0].code === 'file-too-large'
+            ? `File is larger than the maximum allowed size (${filesize(
+                maxSize
+              )})`
+            : file.errors[0].message;
+        showErrorNotification(
+          errorMessage,
+          `Unable to upload ${file.file.name}`
+        );
+      });
+    },
+    [showErrorNotification, maxSize]
+  );
+
   return (
     <>
       <Dropzone
         onDrop={handleDrop}
-        onReject={console.log}
+        onReject={handleReject}
         accept={PDF_MIME_TYPE}
-        maxSize={TEN_MB}
+        maxSize={maxSize}
         maxFiles={1}
         multiple={false}
         name="file"

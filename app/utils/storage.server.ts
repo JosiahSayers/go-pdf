@@ -1,4 +1,4 @@
-import { PassThrough } from 'stream';
+import type { PassThrough } from 'stream';
 import aws from 'aws-sdk';
 import {
   S3Client,
@@ -41,7 +41,11 @@ async function getFile({ fileUrl, id }: GetFileParams) {
   }
 }
 
-async function uploadStream(key: string, contentType: string) {
+async function uploadStream(
+  key: string,
+  contentType: string,
+  stream: PassThrough
+) {
   const s3 = new aws.S3({
     region: 'auto',
     endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -51,14 +55,9 @@ async function uploadStream(key: string, contentType: string) {
     },
   });
 
-  const pass = new PassThrough();
-
-  return {
-    writeStream: pass,
-    promise: s3
-      .upload({ Bucket, Key: key, Body: pass, ContentType: contentType })
-      .promise(),
-  };
+  return s3
+    .upload({ Bucket, Key: key, Body: stream, ContentType: contentType })
+    .promise();
 }
 
 async function deleteFile(id: string) {
