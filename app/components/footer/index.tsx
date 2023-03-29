@@ -30,7 +30,7 @@ export default function AppFooter() {
           <Text>&#169; {new Date().getFullYear()}</Text>
         </Stack>
         <FooterLinkSection title="Support" links={supportLinks} />
-        <FooterLinkSection title="PdfMe" links={pdfMeLinks} />
+        <FooterLinkSection title="About" links={pdfMeLinks} />
       </Flex>
     </Footer>
   );

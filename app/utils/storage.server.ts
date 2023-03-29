@@ -70,9 +70,12 @@ async function deleteFile(id: string) {
   }
 }
 
-async function getAllObjects() {
+async function getAllObjects(userId: string) {
   try {
-    return db.file.findMany({ orderBy: { createdAt: 'asc' } });
+    return db.file.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+    });
   } catch (e) {
     console.error('Error grabbing bucket objects', e);
     throw e;

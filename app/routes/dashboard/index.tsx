@@ -3,7 +3,7 @@ import type { FileWithPath } from '@mantine/dropzone';
 import type { FileRejection } from 'react-dropzone';
 import { PDF_MIME_TYPE } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
-import type { ActionArgs } from '@remix-run/node';
+import type { ActionArgs, LoaderArgs } from '@remix-run/node';
 import { unstable_parseMultipartFormData } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
@@ -17,18 +17,24 @@ import { Storage } from '~/utils/storage.server';
 import { FileTooLargeError, Uploads } from '~/utils/upload-handler';
 import { filesize } from 'filesize';
 
-export async function loader() {
-  const objects = await Storage.getAllObjects();
+export async function loader({ request }: LoaderArgs) {
+  const userId = await Session.requireLoggedInUser(request);
+  const objects = await Storage.getAllObjects(userId);
   const maxSize = Uploads.ONE_MB;
-  return json({ existingObjects: objects ?? [], maxSize });
+  return json({
+    existingObjects: objects ?? [],
+    maxSize,
+  });
 }
 
 export async function action({ request }: ActionArgs) {
   await Session.validateCsrf(request);
+  const userId = await Session.requireLoggedInUser(request);
   try {
-    const uploadHandler = await Uploads.createUploadHandler();
+    const uploadHandler = await Uploads.createUploadHandler({ userId });
     await unstable_parseMultipartFormData(request, uploadHandler);
   } catch (e) {
+    console.error(e);
     if (e instanceof FileTooLargeError) {
       return json({ error: 'File is too large' });
     }

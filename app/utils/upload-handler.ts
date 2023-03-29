@@ -24,8 +24,13 @@ const ONE_HUNDRED_MB = 1e8;
 const createUploadHandler = async ({
   namesOfFile = 'file',
   maxSize = ONE_MB,
-} = {}) => {
-  const fileRecord = await db.file.create({ data: { url: getUrl() } });
+  userId,
+}: {
+  namesOfFile?: string;
+  maxSize?: number;
+  userId: string;
+}) => {
+  const fileRecord = await db.file.create({ data: { url: getUrl(), userId } });
   const uploadHandler: UploadHandler = async ({
     data,
     filename,

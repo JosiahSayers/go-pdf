@@ -1,3 +1,5 @@
+import { openContextModal } from '@mantine/modals';
+
 export default function Index() {
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
@@ -24,6 +26,20 @@ export default function Index() {
         <li>
           <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
             Remix Docs
+          </a>
+        </li>
+        <li>
+          <a
+            onClick={() =>
+              openContextModal({
+                modal: 'login',
+                title: 'Login',
+                centered: true,
+                innerProps: {},
+              })
+            }
+          >
+            Login
           </a>
         </li>
       </ul>

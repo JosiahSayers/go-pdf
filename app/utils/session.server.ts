@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node';
+import { createCookieSessionStorage, redirect } from '@remix-run/node';
 import { randomBytes } from 'crypto';
 
 type SessionData = {
@@ -59,6 +59,15 @@ const validateCsrf = async (request: Request) => {
   ) {
     throw new Error('CSRF error');
   }
+  return session;
+};
+const requireLoggedInUser = async (request: Request) => {
+  const session = await get(request);
+  const userId = session.get('userId');
+  if (!userId) {
+    throw redirect('/');
+  }
+  return userId;
 };
 
 export const Session = {
@@ -67,4 +76,5 @@ export const Session = {
   destroySessionWithHeaders,
   generateCsrfToken,
   validateCsrf,
+  requireLoggedInUser,
 };

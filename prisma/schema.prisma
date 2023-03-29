@@ -13,8 +13,24 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  profile Profile?
+  files   File[]
+}
+
+model Profile {
+  id      String  @id @default(uuid())
+  name    String
+  company String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
 }
 
 model File {
@@ -26,6 +42,8 @@ model File {
   updatedAt DateTime @updatedAt
 
   events FileEvent[] @relation()
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 }
 
 enum FileEvents {
