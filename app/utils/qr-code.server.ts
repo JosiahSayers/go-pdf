@@ -1,7 +1,8 @@
 import QrCode from 'qrcode';
+import { DeployInfo } from '~/utils/deploy-info.server';
 
 async function createForFile(id: string) {
-  return QrCode.toBuffer(`http://192.168.1.151:3000/qr?id=${id}`, {
+  return QrCode.toBuffer(`${DeployInfo.url}/qr?id=${id}`, {
     errorCorrectionLevel: 'H',
     type: 'png',
     scale: 10,
