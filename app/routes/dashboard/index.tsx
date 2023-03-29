@@ -34,7 +34,6 @@ export default function Dashboard() {
 
   const handleDrop = useCallback(
     (newFile: FileWithPath[]) => {
-      console.log(newFile);
       const formData = new FormData();
       formData.append('file', newFile[0]);
       formData.append('csrf', csrf);
