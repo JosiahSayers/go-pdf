@@ -3,6 +3,7 @@ import { json } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 import { z } from 'zod';
+import { Authorization } from '~/utils/authorization.server';
 import { db } from '~/utils/db.server';
 import { Session } from '~/utils/session.server';
 
@@ -16,6 +17,8 @@ export const editPdfValidator = withZod(editPdfSchema);
 
 export async function action({ request, params }: ActionArgs) {
   await Session.validateCsrf(request);
+  const userId = await Session.requireLoggedInUser(request);
+  await Authorization.requireUserOwnsFile(userId, params.id!);
   const result = await editPdfValidator.validate(await request.formData());
   if (result.error) {
     return validationError(result.error);
