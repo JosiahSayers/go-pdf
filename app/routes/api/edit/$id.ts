@@ -50,7 +50,11 @@ export async function action({ request, params }: ActionArgs) {
       data: { url: result.data.url },
     }),
     db.fileEvent.create({
-      data: { fileId: file.id, event: 'url_update' },
+      data: {
+        fileId: file.id,
+        event: 'url_update',
+        meta: `From: ${file.url} To: ${result.data.url}`,
+      },
     }),
   ]);
   return json({ success: true });

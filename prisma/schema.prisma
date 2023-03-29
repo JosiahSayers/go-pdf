@@ -55,6 +55,7 @@ enum FileEvents {
 model FileEvent {
   id        String     @id @default(uuid())
   event     FileEvents
+  meta      String?
   createdAt DateTime   @default(now())
 
   fileId String
