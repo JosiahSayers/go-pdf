@@ -7,7 +7,7 @@ export class SubscriptionNotFoundError extends Error {}
 interface BaseSubscriptionWithContext {
   subscription: Subscription;
   maxUploadSize: number;
-  maxUploadCount: number;
+  maxUploadCount: number | null;
 }
 
 interface FullSubscriptionWithContext extends BaseSubscriptionWithContext {
@@ -67,7 +67,8 @@ function canUpload(
 ): CanUploadResponse {
   const maxUploads = maxUploadCount(subscription);
   const statusIsValid = subscription.status === 'valid';
-  const hasRemainingUploads = currentFiles.length < maxUploads;
+  const hasRemainingUploads =
+    maxUploads === null || currentFiles.length < maxUploads;
 
   if (!statusIsValid) {
     return {
@@ -90,7 +91,7 @@ function canUpload(
 
 function maxUploadCount(subscription: Subscription) {
   if (subscription.level === 'paid') {
-    return Infinity;
+    return null;
   } else {
     // free account
     return 1;

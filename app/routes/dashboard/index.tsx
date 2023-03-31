@@ -1,4 +1,4 @@
-import { Space, Stack, Text } from '@mantine/core';
+import { Space, Stack } from '@mantine/core';
 import type { FileWithPath } from '@mantine/dropzone';
 import type { FileRejection } from 'react-dropzone';
 import { PDF_MIME_TYPE } from '@mantine/dropzone';
@@ -17,6 +17,7 @@ import { Storage } from '~/utils/storage.server';
 import { FileTooLargeError, Uploads } from '~/utils/upload-handler';
 import { filesize } from 'filesize';
 import { Subscriptions } from '~/utils/subscription.server';
+import SubscriptionStatus from '~/components/dashboard/subscription-status';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
@@ -26,7 +27,8 @@ export async function loader({ request }: LoaderArgs) {
     userId,
     files
   );
-  const remainingUploadCount = maxUploadCount - files.length;
+  const remainingUploadCount =
+    maxUploadCount === null ? null : maxUploadCount - files.length;
   return json({
     existingObjects: files,
     maxUploadSize,
@@ -97,7 +99,6 @@ export default function Dashboard() {
 
   const handleReject = useCallback(
     (fileRejections: FileRejection[]) => {
-      console.log(fileRejections);
       fileRejections.forEach((file) => {
         const errorMessage =
           file.errors[0].code === 'file-too-large'
@@ -142,13 +143,7 @@ export default function Dashboard() {
         {fetcher.state !== 'idle' && <PdfCardSkeleton />}
       </Stack>
 
-      <Text>
-        {/* TODO: Flush out this message with more information. Link to subscription page 
-        where a user can edit their subscription. Change the text if there are no 
-        more uploads available or if remaining uploads === Infinity. */}
-        You can upload {remainingUploadCount} more PDFs. If you need more you
-        can upgrade your account.
-      </Text>
+      <SubscriptionStatus remainingUploadCount={remainingUploadCount} />
     </>
   );
 }
