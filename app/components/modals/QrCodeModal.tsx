@@ -10,6 +10,7 @@ export default function QrCodeModal({
 
   return (
     <>
+      {/* TODO: Create UI for user who does not have an active subscription */}
       <Text size="sm">
         This QR code links directly to your PDF. Download it, print it, add it
         to your social media. It code will work as long as the PDF is not

@@ -30,6 +30,7 @@ export default function AnalyticsModal({
       {loading && <AnalyticsModalSkeleton />}
       {noEvents && <AnalyticsModalNoEvents />}
       {showEvents && <AnalyticsModalEvents events={fetcher.data!} />}
+      {/* TODO: Create UI for user who does not have an active subscription */}
 
       <Button fullWidth mt="md" onClick={() => context.closeModal(id)}>
         Close

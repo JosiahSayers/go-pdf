@@ -1,4 +1,4 @@
-import { Space, Stack } from '@mantine/core';
+import { Space, Stack, Text } from '@mantine/core';
 import type { FileWithPath } from '@mantine/dropzone';
 import type { FileRejection } from 'react-dropzone';
 import { PDF_MIME_TYPE } from '@mantine/dropzone';
@@ -16,22 +16,35 @@ import { Session } from '~/utils/session.server';
 import { Storage } from '~/utils/storage.server';
 import { FileTooLargeError, Uploads } from '~/utils/upload-handler';
 import { filesize } from 'filesize';
+import { Subscriptions } from '~/utils/subscription.server';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
-  const objects = await Storage.getAllObjects(userId);
-  const maxSize = Uploads.ONE_MB;
+  const files = await Storage.getAllObjects(userId);
+  // TODO: if account is free and any file is over max size disable that file
+  const { maxUploadCount, maxUploadSize, canUpload } = await Subscriptions.find(
+    userId,
+    files
+  );
+  const remainingUploadCount = maxUploadCount - files.length;
   return json({
-    existingObjects: objects ?? [],
-    maxSize,
+    existingObjects: files,
+    maxUploadSize,
+    canUpload,
+    maxUploadCount,
+    remainingUploadCount,
   });
 }
 
 export async function action({ request }: ActionArgs) {
   await Session.validateCsrf(request);
   const userId = await Session.requireLoggedInUser(request);
+  const { maxUploadSize } = await Subscriptions.find(userId);
   try {
-    const uploadHandler = await Uploads.createUploadHandler({ userId });
+    const uploadHandler = await Uploads.createUploadHandler({
+      userId,
+      maxSize: maxUploadSize,
+    });
     await unstable_parseMultipartFormData(request, uploadHandler);
   } catch (e) {
     console.error(e);
@@ -48,7 +61,8 @@ export async function action({ request }: ActionArgs) {
 
 export default function Dashboard() {
   const csrf = useCsrf();
-  const { existingObjects, maxSize } = useLoaderData<typeof loader>();
+  const { existingObjects, maxUploadSize, canUpload, remainingUploadCount } =
+    useLoaderData<typeof loader>();
   const fetcher = useFetcher();
 
   const showErrorNotification = useCallback(
@@ -57,7 +71,7 @@ export default function Dashboard() {
         title,
         message,
         color: 'red',
-        autoClose: 10000,
+        autoClose: false,
       }),
     []
   );
@@ -88,7 +102,7 @@ export default function Dashboard() {
         const errorMessage =
           file.errors[0].code === 'file-too-large'
             ? `File is larger than the maximum allowed size (${filesize(
-                maxSize
+                maxUploadSize
               )})`
             : file.errors[0].message;
         showErrorNotification(
@@ -97,7 +111,7 @@ export default function Dashboard() {
         );
       });
     },
-    [showErrorNotification, maxSize]
+    [showErrorNotification, maxUploadSize]
   );
 
   return (
@@ -106,11 +120,16 @@ export default function Dashboard() {
         onDrop={handleDrop}
         onReject={handleReject}
         accept={PDF_MIME_TYPE}
-        maxSize={maxSize}
+        maxSize={canUpload.canUpload ? maxUploadSize : undefined}
         maxFiles={1}
         multiple={false}
         name="file"
         loading={fetcher.state !== 'idle'}
+        validator={() =>
+          !canUpload.canUpload
+            ? { message: canUpload.reason, code: 'uploads-disabled' }
+            : null
+        }
       />
 
       <Space h="xl" />
@@ -122,6 +141,14 @@ export default function Dashboard() {
 
         {fetcher.state !== 'idle' && <PdfCardSkeleton />}
       </Stack>
+
+      <Text>
+        {/* TODO: Flush out this message with more information. Link to subscription page 
+        where a user can edit their subscription. Change the text if there are no 
+        more uploads available or if remaining uploads === Infinity. */}
+        You can upload {remainingUploadCount} more PDFs. If you need more you
+        can upgrade your account.
+      </Text>
     </>
   );
 }

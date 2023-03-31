@@ -4,7 +4,9 @@ import type { DropzoneProps } from '@mantine/dropzone';
 import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 import { filesize } from 'filesize';
 
-type Props = Omit<DropzoneProps, 'children'> & { fullscreen?: boolean };
+interface Props extends Omit<DropzoneProps, 'children'> {
+  fullscreen?: boolean;
+}
 
 export default function Dropzone(props: Props) {
   const theme = useMantineTheme();

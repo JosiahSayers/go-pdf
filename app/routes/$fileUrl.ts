@@ -19,6 +19,8 @@ export async function loader({ params, request }: LoaderArgs) {
   try {
     const { isQrLoad, ...rest } = getFileParams({ params, request });
     const { file, fileStore } = await Storage.getFile(rest);
+    // TODO: if account is free and any file is over max size disable that file
+    // and log a new event for blocked views
     await db.fileEvent.create({
       data: {
         fileId: file.id,

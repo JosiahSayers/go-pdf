@@ -38,6 +38,7 @@ export default function AnalyticsModal({
         method="post"
         action={`/api/edit/${innerProps.file.id}`}
       >
+        {/* TODO: Create UI for user who does not have an active subscription */}
         <Stack>
           <ValidatedTextInput
             defaultValue={innerProps.file.url}
