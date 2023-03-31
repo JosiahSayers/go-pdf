@@ -59,7 +59,7 @@ interface CanNotUpload {
   reason: string;
 }
 
-type CanUploadResponse = CanUpload | CanNotUpload;
+export type CanUploadResponse = CanUpload | CanNotUpload;
 
 function canUpload(
   subscription: Subscription,

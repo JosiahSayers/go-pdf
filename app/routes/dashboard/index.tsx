@@ -121,7 +121,7 @@ export default function Dashboard() {
         onDrop={handleDrop}
         onReject={handleReject}
         accept={PDF_MIME_TYPE}
-        maxSize={canUpload.canUpload ? maxUploadSize : undefined}
+        maxSize={maxUploadSize}
         maxFiles={1}
         multiple={false}
         name="file"
@@ -131,6 +131,7 @@ export default function Dashboard() {
             ? { message: canUpload.reason, code: 'uploads-disabled' }
             : null
         }
+        canUpload={canUpload}
       />
 
       <Space h="xl" />
@@ -143,7 +144,12 @@ export default function Dashboard() {
         {fetcher.state !== 'idle' && <PdfCardSkeleton />}
       </Stack>
 
-      <SubscriptionStatus remainingUploadCount={remainingUploadCount} />
+      <Space h="5rem" />
+
+      <SubscriptionStatus
+        remainingUploadCount={remainingUploadCount}
+        canUpload={canUpload}
+      />
     </>
   );
 }

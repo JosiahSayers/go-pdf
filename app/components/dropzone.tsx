@@ -3,9 +3,12 @@ import { IconUpload, IconX, IconFile } from '@tabler/icons-react';
 import type { DropzoneProps } from '@mantine/dropzone';
 import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 import { filesize } from 'filesize';
+import type { SerializeFrom } from '@remix-run/node';
+import type { loader } from '~/routes/dashboard/index';
 
 interface Props extends Omit<DropzoneProps, 'children'> {
   fullscreen?: boolean;
+  canUpload: SerializeFrom<typeof loader>['canUpload'];
 }
 
 export default function Dropzone(props: Props) {
@@ -16,7 +19,11 @@ export default function Dropzone(props: Props) {
     : MantineDropzone;
 
   return (
-    <DropzoneComponent {...props} active={props.fullscreen ? true : undefined}>
+    <DropzoneComponent
+      {...props}
+      active={props.fullscreen ? true : undefined}
+      maxSize={props.canUpload.canUpload ? props.maxSize : undefined}
+    >
       <Group
         position="center"
         spacing="xl"
