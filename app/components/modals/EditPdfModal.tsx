@@ -1,5 +1,5 @@
 import type { ContextModalProps } from '@mantine/modals';
-import { Alert, Button, Group, Stack, Text } from '@mantine/core';
+import { Button, Group, Stack, Text } from '@mantine/core';
 import type { File, SubscriptionLevel } from '@prisma/client';
 import type { SerializeFrom } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
@@ -9,7 +9,6 @@ import ValidatedTextInput from '~/components/ValidatedTextInput';
 import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 import { useCsrf } from '~/components/context/csrf';
-import { IconAlertCircle } from '@tabler/icons-react';
 import LockedFeatureAlert from '~/components/locked-feature-alert';
 
 export default function AnalyticsModal({

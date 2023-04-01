@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Authorization } from '~/utils/authorization.server';
 import { db } from '~/utils/db.server';
 import { Session } from '~/utils/session.server';
+import { Subscriptions } from '~/utils/subscription.server';
 
 export const editPdfSchema = z.object({
   url: z
@@ -18,6 +19,7 @@ export const editPdfValidator = withZod(editPdfSchema);
 export async function action({ request, params }: ActionArgs) {
   await Session.validateCsrf(request);
   const userId = await Session.requireLoggedInUser(request);
+  await Subscriptions.ensureValidSubscription({ userId });
   await Authorization.requireUserOwnsFile(userId, params.id!);
   const result = await editPdfValidator.validate(await request.formData());
   if (result.error) {

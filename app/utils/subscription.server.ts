@@ -1,4 +1,5 @@
 import type { File, Subscription } from '@prisma/client';
+import { json } from '@remix-run/node';
 import { db } from '~/utils/db.server';
 import { Uploads } from '~/utils/upload-handler';
 
@@ -98,9 +99,50 @@ function maxUploadCount(subscription: Subscription) {
   }
 }
 
+async function ensureValidSubscription({
+  userId,
+}: {
+  userId: string;
+}): Promise<null>;
+async function ensureValidSubscription({
+  subscription,
+}: {
+  subscription: Subscription;
+}): Promise<null>;
+async function ensureValidSubscription({
+  userId,
+  subscription,
+}: {
+  userId?: string;
+  subscription?: Subscription;
+}): Promise<null> {
+  let sub: Subscription;
+  if (userId) {
+    sub = (await find(userId)).subscription;
+  } else if (subscription) {
+    sub = subscription;
+  } else {
+    throw json({ error: 'Unknown error' }, { status: 500 });
+  }
+
+  if (sub.level !== 'free' && sub.status === 'payment_issue') {
+    throw json(
+      { error: 'There was an issue with your most recent payment' },
+      { status: 401 }
+    );
+  } else if (sub.level === 'free') {
+    throw json(
+      { error: 'Active subscription required to access this content' },
+      { status: 401 }
+    );
+  }
+  return null;
+}
+
 export const Subscriptions = {
   find,
   maxUploadSize,
   canUpload,
   maxUploadCount,
+  ensureValidSubscription,
 };

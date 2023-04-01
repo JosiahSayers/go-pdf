@@ -2,9 +2,11 @@ import type { LoaderArgs } from '@remix-run/node';
 import { db } from '~/utils/db.server';
 import { QR } from '~/utils/qr-code.server';
 import { Session } from '~/utils/session.server';
+import { Subscriptions } from '~/utils/subscription.server';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
+  await Subscriptions.ensureValidSubscription({ userId });
   const id = new URL(request.url).searchParams.get('id');
   if (!id) {
     return new Response('Missing id search parameter', { status: 403 });

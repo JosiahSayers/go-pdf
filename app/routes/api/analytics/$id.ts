@@ -4,10 +4,12 @@ import { DateTime } from 'luxon';
 import { Authorization } from '~/utils/authorization.server';
 import { db } from '~/utils/db.server';
 import { Session } from '~/utils/session.server';
+import { Subscriptions } from '~/utils/subscription.server';
 
 export async function loader({ params, request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
-  // TODO: Return error if user does not have an active subscription
+  await Subscriptions.ensureValidSubscription({ userId });
+
   await Authorization.requireUserOwnsFile(userId, params.id!);
   const tenDaysAgo = DateTime.utc().plus({ days: -10 });
   const [totalQrLoads, totalWebsiteLoads, events] = await db.$transaction([
