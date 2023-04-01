@@ -1,62 +1,44 @@
+import { AppShell, Container, Stack, Title } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
+import { redirect } from '@remix-run/node';
+import { useCallback } from 'react';
+import AppFooter from '~/components/footer';
+import Header from '~/components/marketing/header';
+
+export async function loader() {
+  return redirect('/pdf-hosting');
+}
 
 export default function Index() {
+  const openLoginModal = useCallback(
+    () =>
+      openContextModal({
+        modal: 'login',
+        title: 'Login',
+        centered: true,
+        innerProps: {},
+      }),
+    []
+  );
+
+  const openRegisterModal = useCallback(
+    () =>
+      openContextModal({
+        modal: 'register',
+        title: 'Register',
+        centered: true,
+        innerProps: {},
+      }),
+    []
+  );
+
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={() =>
-              openContextModal({
-                modal: 'login',
-                title: 'Login',
-                centered: true,
-                innerProps: {},
-              })
-            }
-          >
-            Login
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={() =>
-              openContextModal({
-                modal: 'register',
-                title: 'Register',
-                centered: true,
-                innerProps: {},
-              })
-            }
-          >
-            Register
-          </a>
-        </li>
-      </ul>
-    </div>
+    <AppShell fixed={false} header={<Header />} footer={<AppFooter />}>
+      <Container mih="100vh">
+        <Stack align="center">
+          <Title order={1}>We make document sharing easy</Title>
+        </Stack>
+      </Container>
+    </AppShell>
   );
 }

@@ -25,9 +25,6 @@ export default function SubscriptionStatus({
 
   return (
     <Text>
-      {/* TODO: Flush out this message with more information. Link to subscription page 
-        where a user can edit their subscription. Change the text if there are no 
-        more uploads available or if remaining uploads === Infinity. */}
       * {remainingCountText} Upgrading your account will allow you to upload
       more PDF files as well as unlock features like analytics and QR codes.
     </Text>

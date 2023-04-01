@@ -20,7 +20,7 @@ import { CsrfProvider } from '~/components/context/csrf';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'New Remix App',
+  title: 'GoPDF',
   viewport: 'width=device-width,initial-scale=1',
 });
 
