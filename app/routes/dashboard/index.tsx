@@ -34,6 +34,7 @@ export async function loader({ request }: LoaderArgs) {
     maxUploadCount,
     remainingUploadCount,
     subscriptionLevel: subscription.level,
+    paymentFailure: subscription.status === 'payment_issue',
   });
 }
 
@@ -68,6 +69,7 @@ export default function Dashboard() {
     canUpload,
     remainingUploadCount,
     subscriptionLevel,
+    paymentFailure,
   } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
 
@@ -146,6 +148,7 @@ export default function Dashboard() {
             file={obj}
             subscriptionLevel={subscriptionLevel}
             key={obj.id}
+            paymentFailure={paymentFailure}
           />
         ))}
 

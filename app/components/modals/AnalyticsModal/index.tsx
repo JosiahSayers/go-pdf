@@ -16,9 +16,11 @@ export default function AnalyticsModal({
 }: ContextModalProps<{
   fileId: string;
   subscriptionLevel: SubscriptionLevel;
+  paymentFailure: boolean;
 }>) {
   const fetcher = useFetcher<typeof loader>();
-  const canView = innerProps.subscriptionLevel !== 'free';
+  const canView =
+    innerProps.subscriptionLevel !== 'free' && !innerProps.paymentFailure;
 
   useEffect(() => {
     if (fetcher.type === 'init' && canView) {
@@ -34,7 +36,7 @@ export default function AnalyticsModal({
   return (
     <Stack>
       {!canView && (
-        <LockedFeatureAlert>
+        <LockedFeatureAlert paymentFailure={innerProps.paymentFailure}>
           Upgrade to a paid subscription to unlock the ability to view detailed
           analytics about your PDF's usage.
         </LockedFeatureAlert>

@@ -19,10 +19,12 @@ export default function AnalyticsModal({
 }: ContextModalProps<{
   file: SerializeFrom<File>;
   subscriptionLevel: SubscriptionLevel;
+  paymentFailure: boolean;
 }>) {
   const fetcher = useFetcher();
   const csrf = useCsrf();
-  const canEdit = innerProps.subscriptionLevel !== 'free';
+  const canEdit =
+    innerProps.subscriptionLevel !== 'free' && !innerProps.paymentFailure;
 
   useEffect(() => {
     if (fetcher.data?.success) {
@@ -46,7 +48,7 @@ export default function AnalyticsModal({
       >
         <Stack>
           {!canEdit && (
-            <LockedFeatureAlert>
+            <LockedFeatureAlert paymentFailure={innerProps.paymentFailure}>
               Upgrade to a paid subscription to unlock the ability to create a
               custom URL for your PDFs.
             </LockedFeatureAlert>

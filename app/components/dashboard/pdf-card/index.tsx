@@ -21,9 +21,14 @@ import { useCsrf } from '~/components/context/csrf';
 interface Props {
   file: SerializeFrom<File>;
   subscriptionLevel: SubscriptionLevel;
+  paymentFailure: boolean;
 }
 
-export default function PdfCard({ file, subscriptionLevel }: Props) {
+export default function PdfCard({
+  file,
+  subscriptionLevel,
+  paymentFailure,
+}: Props) {
   const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
   const csrf = useCsrf();
@@ -36,6 +41,7 @@ export default function PdfCard({ file, subscriptionLevel }: Props) {
       innerProps: {
         fileId: file.id,
         subscriptionLevel,
+        paymentFailure,
       },
     });
 
@@ -47,6 +53,7 @@ export default function PdfCard({ file, subscriptionLevel }: Props) {
       innerProps: {
         file,
         subscriptionLevel,
+        paymentFailure,
       },
     });
 
@@ -58,6 +65,7 @@ export default function PdfCard({ file, subscriptionLevel }: Props) {
       innerProps: {
         fileId: file.id,
         subscriptionLevel,
+        paymentFailure,
       },
     });
 

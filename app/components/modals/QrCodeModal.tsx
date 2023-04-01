@@ -11,9 +11,11 @@ export default function QrCodeModal({
 }: ContextModalProps<{
   fileId: string;
   subscriptionLevel: SubscriptionLevel;
+  paymentFailure: boolean;
 }>) {
   const url = `/api/qr-code?id=${innerProps.fileId}`;
-  const canView = innerProps.subscriptionLevel !== 'free';
+  const canView =
+    innerProps.subscriptionLevel !== 'free' && !innerProps.paymentFailure;
   const imageRef = useRef<HTMLImageElement>(null);
   const [imageLoading, setImageLoading] = useState(canView);
 
@@ -27,7 +29,7 @@ export default function QrCodeModal({
   return (
     <Stack>
       {!canView && (
-        <LockedFeatureAlert>
+        <LockedFeatureAlert paymentFailure={innerProps.paymentFailure}>
           Upgrade to a paid subscriptionto gain access to an automatically
           generated QR code that can be used to access this PDF.
         </LockedFeatureAlert>
