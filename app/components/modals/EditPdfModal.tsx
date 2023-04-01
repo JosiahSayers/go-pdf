@@ -1,6 +1,6 @@
 import type { ContextModalProps } from '@mantine/modals';
 import { Alert, Button, Group, Stack, Text } from '@mantine/core';
-import type { File } from '@prisma/client';
+import type { File, SubscriptionLevel } from '@prisma/client';
 import type { SerializeFrom } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { ValidatedForm } from 'remix-validated-form';
@@ -9,14 +9,20 @@ import ValidatedTextInput from '~/components/ValidatedTextInput';
 import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 import { useCsrf } from '~/components/context/csrf';
+import { IconAlertCircle } from '@tabler/icons-react';
+import LockedFeatureAlert from '~/components/locked-feature-alert';
 
 export default function AnalyticsModal({
   context,
   id,
   innerProps,
-}: ContextModalProps<{ file: SerializeFrom<File> }>) {
+}: ContextModalProps<{
+  file: SerializeFrom<File>;
+  subscriptionLevel: SubscriptionLevel;
+}>) {
   const fetcher = useFetcher();
   const csrf = useCsrf();
+  const canEdit = innerProps.subscriptionLevel !== 'free';
 
   useEffect(() => {
     if (fetcher.data?.success) {
@@ -38,8 +44,13 @@ export default function AnalyticsModal({
         method="post"
         action={`/api/edit/${innerProps.file.id}`}
       >
-        {/* TODO: Create UI for user who does not have an active subscription */}
         <Stack>
+          {!canEdit && (
+            <LockedFeatureAlert>
+              Upgrade to a paid subscription to unlock the ability to create a
+              custom URL for your PDFs.
+            </LockedFeatureAlert>
+          )}
           <ValidatedTextInput
             defaultValue={innerProps.file.url}
             label="Custom URL"
@@ -47,15 +58,9 @@ export default function AnalyticsModal({
             icon={<Text>pdf.me/</Text>}
             iconWidth={65}
             name="url"
-            disabled={fetcher.state === 'submitting'}
+            disabled={!canEdit || fetcher.state === 'submitting'}
           />
           <input type="hidden" defaultValue={csrf} name="csrf" />
-
-          {fetcher.state === 'idle' && fetcher.data?.success && (
-            <Alert title="Saved!" color="green">
-              We've got your new URL all queued up and ready to go.
-            </Alert>
-          )}
 
           <Group position="right">
             <Button
@@ -72,6 +77,7 @@ export default function AnalyticsModal({
               mt="md"
               type="submit"
               loading={fetcher.state === 'submitting'}
+              disabled={!canEdit}
             >
               Save
             </Button>

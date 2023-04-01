@@ -8,7 +8,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import type { File } from '@prisma/client';
+import type { File, SubscriptionLevel } from '@prisma/client';
 import type { SerializeFrom } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { IconFileText } from '@tabler/icons-react';
@@ -20,9 +20,10 @@ import { useCsrf } from '~/components/context/csrf';
 
 interface Props {
   file: SerializeFrom<File>;
+  subscriptionLevel: SubscriptionLevel;
 }
 
-export default function PdfCard({ file }: Props) {
+export default function PdfCard({ file, subscriptionLevel }: Props) {
   const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
   const csrf = useCsrf();
@@ -34,6 +35,7 @@ export default function PdfCard({ file }: Props) {
       centered: true,
       innerProps: {
         fileId: file.id,
+        subscriptionLevel,
       },
     });
 
@@ -44,6 +46,7 @@ export default function PdfCard({ file }: Props) {
       centered: true,
       innerProps: {
         file,
+        subscriptionLevel,
       },
     });
 
@@ -54,6 +57,7 @@ export default function PdfCard({ file }: Props) {
       centered: true,
       innerProps: {
         fileId: file.id,
+        subscriptionLevel,
       },
     });
 

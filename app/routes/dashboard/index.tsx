@@ -23,10 +23,8 @@ export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
   const files = await Storage.getAllObjects(userId);
   // TODO: if account is free and any file is over max size disable that file
-  const { maxUploadCount, maxUploadSize, canUpload } = await Subscriptions.find(
-    userId,
-    files
-  );
+  const { maxUploadCount, maxUploadSize, canUpload, subscription } =
+    await Subscriptions.find(userId, files);
   const remainingUploadCount =
     maxUploadCount === null ? null : maxUploadCount - files.length;
   return json({
@@ -35,6 +33,7 @@ export async function loader({ request }: LoaderArgs) {
     canUpload,
     maxUploadCount,
     remainingUploadCount,
+    subscriptionLevel: subscription.level,
   });
 }
 
@@ -63,8 +62,13 @@ export async function action({ request }: ActionArgs) {
 
 export default function Dashboard() {
   const csrf = useCsrf();
-  const { existingObjects, maxUploadSize, canUpload, remainingUploadCount } =
-    useLoaderData<typeof loader>();
+  const {
+    existingObjects,
+    maxUploadSize,
+    canUpload,
+    remainingUploadCount,
+    subscriptionLevel,
+  } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
 
   const showErrorNotification = useCallback(
@@ -138,7 +142,11 @@ export default function Dashboard() {
 
       <Stack>
         {existingObjects.map((obj) => (
-          <PdfCard file={obj} key={obj.id} />
+          <PdfCard
+            file={obj}
+            subscriptionLevel={subscriptionLevel}
+            key={obj.id}
+          />
         ))}
 
         {fetcher.state !== 'idle' && <PdfCardSkeleton />}

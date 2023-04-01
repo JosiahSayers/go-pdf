@@ -1,24 +1,30 @@
 import type { ContextModalProps } from '@mantine/modals';
-import { Button } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import { useFetcher } from '@remix-run/react';
 import { useEffect } from 'react';
 import type { loader } from '~/routes/api/analytics/$id';
 import AnalyticsModalNoEvents from '~/components/modals/AnalyticsModal/NoEvents';
 import AnalyticsModalEvents from '~/components/modals/AnalyticsModal/Events';
 import AnalyticsModalSkeleton from '~/components/modals/AnalyticsModal/Skeleton';
+import type { SubscriptionLevel } from '@prisma/client';
+import LockedFeatureAlert from '~/components/locked-feature-alert';
 
 export default function AnalyticsModal({
   context,
   id,
   innerProps,
-}: ContextModalProps<{ fileId: string }>) {
+}: ContextModalProps<{
+  fileId: string;
+  subscriptionLevel: SubscriptionLevel;
+}>) {
   const fetcher = useFetcher<typeof loader>();
+  const canView = innerProps.subscriptionLevel !== 'free';
 
   useEffect(() => {
-    if (fetcher.type === 'init') {
+    if (fetcher.type === 'init' && canView) {
       fetcher.load(`/api/analytics/${innerProps.fileId}`);
     }
-  }, [fetcher, innerProps]);
+  }, [fetcher, innerProps, canView]);
 
   const loading = fetcher.state === 'loading';
   const noEvents =
@@ -26,15 +32,20 @@ export default function AnalyticsModal({
   const showEvents = fetcher.state === 'idle' && !!fetcher.data?.events.length;
 
   return (
-    <>
-      {loading && <AnalyticsModalSkeleton />}
+    <Stack>
+      {!canView && (
+        <LockedFeatureAlert>
+          Upgrade to a paid subscription to unlock the ability to view detailed
+          analytics about your PDF's usage.
+        </LockedFeatureAlert>
+      )}
+      {(loading || !canView) && <AnalyticsModalSkeleton animate={canView} />}
       {noEvents && <AnalyticsModalNoEvents />}
       {showEvents && <AnalyticsModalEvents events={fetcher.data!} />}
-      {/* TODO: Create UI for user who does not have an active subscription */}
 
       <Button fullWidth mt="md" onClick={() => context.closeModal(id)}>
         Close
       </Button>
-    </>
+    </Stack>
   );
 }
