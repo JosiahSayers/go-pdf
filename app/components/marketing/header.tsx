@@ -1,8 +1,21 @@
-import { Anchor, Group, Image } from '@mantine/core';
+import { Anchor, Button, Group, Image } from '@mantine/core';
 import { Header as MantineHeader } from '@mantine/core';
+import { openContextModal } from '@mantine/modals';
 import { Link } from '@remix-run/react';
+import { useCallback } from 'react';
 
 export default function Header() {
+  const openLoginModal = useCallback(
+    () =>
+      openContextModal({
+        modal: 'login',
+        title: 'Login',
+        centered: true,
+        innerProps: {},
+      }),
+    []
+  );
+
   return (
     <MantineHeader height={60} px="3rem">
       <Group sx={{ height: '100%' }} position="apart">
@@ -14,6 +27,9 @@ export default function Header() {
           <Anchor component={Link} to="/pricing">
             Pricing
           </Anchor>
+          <Button variant="subtle" onClick={openLoginModal}>
+            Login
+          </Button>
         </Group>
       </Group>
     </MantineHeader>

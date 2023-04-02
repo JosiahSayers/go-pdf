@@ -95,7 +95,7 @@ export default function PdfCard({
             <Stack ml="sm">
               <Text weight="bold">{file.name}</Text>
               <Anchor size="sm" href={`/${file.url}`}>
-                pdf.me/{file.url}
+                gopdf.app/{file.url}
               </Anchor>
             </Stack>
           </Grid.Col>

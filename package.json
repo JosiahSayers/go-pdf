@@ -1,6 +1,7 @@
 {
   "private": true,
   "sideEffects": false,
+  "proxy": "<http://localhost:4242>",
   "scripts": {
     "build": "remix build",
     "dev": "remix dev",
@@ -38,6 +39,7 @@
     "react-dom": "^18.2.0",
     "recharts": "^2.5.0",
     "remix-validated-form": "^4.6.10",
+    "stripe": "^11.17.0",
     "unique-names-generator": "^4.7.1",
     "zod": "^3.21.4"
   },

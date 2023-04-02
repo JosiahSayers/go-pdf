@@ -139,10 +139,15 @@ async function ensureValidSubscription({
   return null;
 }
 
+async function update(subscriptionId: string, data: Partial<Subscription>) {
+  return db.subscription.update({ where: { id: subscriptionId }, data });
+}
+
 export const Subscriptions = {
   find,
   maxUploadSize,
   canUpload,
   maxUploadCount,
   ensureValidSubscription,
+  update,
 };

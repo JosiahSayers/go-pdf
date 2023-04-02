@@ -20,15 +20,8 @@ await writeToEnv('R2_BUCKET', bucketName);
 await writeToEnv('R2_ACCOUNT_ID', accountId);
 await writeToEnv('SESSION_SECRET', 'really-bad-secret');
 
-const databaseUrlExists = await doesEnvVarExist('DATABASE_URL');
-if (!databaseUrlExists) {
-  await writeToEnv('DATABASE_URL', 'REPLACE_ME_WITH_YOUR_DATABASE_URL');
-  console.log(
-    chalk.yellow(
-      'Please fill in the DATABASE_URL variable in the .env file with your development database connection string'
-    )
-  );
-}
+await writeToEnvIfUndefined('DATABASE_URL');
+await writeToEnvIfUndefined('STRIPE_API_KEY');
 
 console.log(chalk.green(`r2 bucket "${bucketName}" has been created.`));
 
@@ -112,5 +105,15 @@ async function checkAccessKeys() {
     const key = await question('Access Key: ');
     await writeToEnv('R2_ACCESS_KEY_ID', keyId);
     await writeToEnv('R2_ACCESS_KEY', key);
+  }
+}
+
+async function writeToEnvIfUndefined(envVar, value = 'REPLACE_ME') {
+  const exists = await doesEnvVarExist(envVar);
+  if (!exists) {
+    await writeToEnv(envVar, value);
+    console.log(
+      chalk.yellow(`Please fill in the ${envVar} variable in the .env file`)
+    );
   }
 }
