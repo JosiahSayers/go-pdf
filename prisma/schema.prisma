@@ -66,8 +66,10 @@ enum PaymentSessionStatus {
 }
 
 model PaymentSession {
-  id     String               @id @default(uuid())
-  status PaymentSessionStatus @default(initiated)
+  id           String               @id @default(uuid())
+  status       PaymentSessionStatus @default(initiated)
+  successValue String
+  failureValue String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

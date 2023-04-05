@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import type { PaymentSessionStatus } from '@prisma/client';
 import Stripe from 'stripe';
 import { db } from '~/utils/db.server';
@@ -21,9 +22,11 @@ async function initiatePayment(userId: string, price: keyof typeof prices) {
   const paymentSession = await db.paymentSession.create({
     data: {
       userId,
+      successValue: randomBytes(50).toString('base64'),
+      failureValue: randomBytes(50).toString('base64'),
     },
   });
-  const makeParams = (status: PaymentSessionStatus) => {
+  const makeParams = (status: string) => {
     const responseParams = new URLSearchParams();
     responseParams.append('sessionId', paymentSession.id);
     responseParams.append('status', status);
@@ -39,19 +42,18 @@ async function initiatePayment(userId: string, price: keyof typeof prices) {
     ],
     mode: 'subscription',
     success_url: `${DeployInfo.url}/payment-response?${makeParams(
-      'successful'
+      paymentSession.successValue
     )}`,
-    cancel_url: `${DeployInfo.url}/payment-response?${makeParams('cancelled')}`,
+    cancel_url: `${DeployInfo.url}/payment-response?${makeParams(
+      paymentSession.failureValue
+    )}`,
     automatic_tax: { enabled: true },
     customer_email: user?.email,
     billing_address_collection: 'auto',
   });
 }
 
-async function processPaymentResponse(
-  sessionId: string,
-  status: PaymentSessionStatus
-) {
+async function processPaymentResponse(sessionId: string, status: string) {
   const session = await db.paymentSession.findUnique({
     where: { id: sessionId },
   });
@@ -64,14 +66,31 @@ async function processPaymentResponse(
     throw new Error('Session has already received a response');
   }
 
+  let newStatus: PaymentSessionStatus;
+
+  console.log({ status });
+  console.log({
+    successValue: session.successValue,
+    failureValue: session.failureValue,
+  });
+  if (status === session.successValue) {
+    newStatus = 'successful';
+  } else if (status === session.failureValue) {
+    newStatus = 'failed';
+  } else {
+    throw new Error(
+      'Status sent does not match up with status values in database'
+    );
+  }
+
   await db.paymentSession.update({
     where: { id: sessionId },
     data: {
-      status,
+      status: newStatus,
     },
   });
 
-  if (status === 'successful') {
+  if (newStatus === 'successful') {
     const { subscription } = await Subscriptions.find(session.userId);
     await Subscriptions.update(subscription.id, {
       status: 'valid',
