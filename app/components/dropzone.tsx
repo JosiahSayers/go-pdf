@@ -11,18 +11,18 @@ interface Props extends Omit<DropzoneProps, 'children'> {
   canUpload: SerializeFrom<typeof loader>['canUpload'];
 }
 
-export default function Dropzone(props: Props) {
+export default function Dropzone({ fullscreen, canUpload, ...props }: Props) {
   const theme = useMantineTheme();
 
-  const DropzoneComponent = props.fullscreen
+  const DropzoneComponent = fullscreen
     ? MantineDropzone.FullScreen
     : MantineDropzone;
 
   return (
     <DropzoneComponent
       {...props}
-      active={props.fullscreen ? true : undefined}
-      maxSize={props.canUpload.canUpload ? props.maxSize : undefined}
+      active={fullscreen ? true : undefined}
+      maxSize={canUpload.canUpload ? props.maxSize : undefined}
     >
       <Group
         position="center"
