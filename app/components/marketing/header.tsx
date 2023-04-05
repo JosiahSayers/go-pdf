@@ -1,15 +1,31 @@
-import { Anchor, Button, Group, Image } from '@mantine/core';
+import { Anchor, Button, Group, Image, Text } from '@mantine/core';
 import { Header as MantineHeader } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
 import { Link } from '@remix-run/react';
 import { useCallback } from 'react';
 
-export default function Header() {
+interface Props {
+  isLoggedIn?: boolean;
+  name?: string;
+}
+
+export default function Header({ isLoggedIn, name }: Props) {
   const openLoginModal = useCallback(
     () =>
       openContextModal({
         modal: 'login',
         title: 'Login',
+        centered: true,
+        innerProps: {},
+      }),
+    []
+  );
+
+  const openRegisterModal = useCallback(
+    () =>
+      openContextModal({
+        modal: 'register',
+        title: 'Create an account',
         centered: true,
         innerProps: {},
       }),
@@ -27,9 +43,18 @@ export default function Header() {
           <Anchor component={Link} to="/pricing">
             Pricing
           </Anchor>
-          <Button variant="subtle" onClick={openLoginModal}>
-            Login
-          </Button>
+          {isLoggedIn ? (
+            <Text>{name}</Text>
+          ) : (
+            <>
+              <Button variant="subtle" onClick={openLoginModal}>
+                Login
+              </Button>
+              <Button variant="subtle" onClick={openRegisterModal}>
+                Create an account
+              </Button>
+            </>
+          )}
         </Group>
       </Group>
     </MantineHeader>
