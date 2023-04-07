@@ -33,8 +33,10 @@ export async function loader({ request }: LoaderArgs) {
     canUpload,
     maxUploadCount,
     remainingUploadCount,
-    subscriptionLevel: subscription.level,
-    paymentFailure: subscription.status === 'payment_issue',
+    subscriptionLevel: subscription?.level ?? 'free',
+    paymentFailure: Subscriptions.paymentFailedStatuses.includes(
+      subscription?.stripeStatus ?? ('' as any)
+    ),
   });
 }
 

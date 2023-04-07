@@ -14,13 +14,14 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
+  stripeId  String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile         Profile?
-  subscription    Subscription?
-  files           File[]
-  paymentSessions PaymentSession[]
+  profile      Profile?
+  subscription Subscription?
+  files        File[]
+  invoices     Invoice[]
 }
 
 model Profile {
@@ -35,21 +36,30 @@ model Profile {
   userId String @unique
 }
 
-enum SubscriptionStatus {
-  valid
-  payment_issue
-  cancelled
-}
-
 enum SubscriptionLevel {
   free
   paid
 }
 
+enum SubscriptionStatus {
+  incomplete
+  incomplete_expired
+  trialing
+  active
+  past_due
+  paused
+  canceled
+  unpaid
+}
+
 model Subscription {
-  id     String             @id @default(uuid())
-  status SubscriptionStatus
-  level  SubscriptionLevel
+  id                 String             @id @default(uuid())
+  level              SubscriptionLevel
+  stripeId           String             @unique
+  stripeStatus       SubscriptionStatus
+  currentPeriodEnd   DateTime
+  currentPeriodStart DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,21 +68,22 @@ model Subscription {
   userId String @unique
 }
 
-enum PaymentSessionStatus {
-  initiated
-  successful
-  failed
-  cancelled
+enum InvoiceStatus {
+  draft
+  open
+  void
+  paid
+  uncollectible
 }
 
-model PaymentSession {
-  id           String               @id @default(uuid())
-  status       PaymentSessionStatus @default(initiated)
-  successValue String
-  failureValue String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Invoice {
+  id            String        @id @default(uuid())
+  stripeId      String        @unique
+  hostedUrl     String?
+  pdfUrl        String?
+  invoiceNumber String?
+  billingReason String?
+  status        InvoiceStatus @default(draft)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String

@@ -41,12 +41,6 @@ export async function action({ request }: ActionArgs) {
           company: formResult.data.company,
         },
       },
-      subscription: {
-        create: {
-          status: 'valid',
-          level: 'free',
-        },
-      },
     },
   });
   session.set('name', formResult.data.name);

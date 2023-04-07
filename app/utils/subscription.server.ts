@@ -1,3 +1,4 @@
+import { SubscriptionStatus } from '@prisma/client';
 import type { File, Subscription } from '@prisma/client';
 import { json } from '@remix-run/node';
 import { db } from '~/utils/db.server';
@@ -5,8 +6,14 @@ import { Uploads } from '~/utils/upload-handler';
 
 export class SubscriptionNotFoundError extends Error {}
 
+const paymentFailedStatuses: SubscriptionStatus[] = [
+  SubscriptionStatus.incomplete,
+  SubscriptionStatus.incomplete_expired,
+  SubscriptionStatus.past_due,
+];
+
 interface BaseSubscriptionWithContext {
-  subscription: Subscription;
+  subscription: Subscription | null;
   maxUploadSize: number;
   maxUploadCount: number | null;
 }
@@ -29,7 +36,7 @@ async function find(userId: string, files?: File[]) {
     const subscription = await db.subscription.findUnique({
       where: { userId },
     });
-    if (!subscription) throw new SubscriptionNotFoundError();
+
     return {
       subscription,
       maxUploadSize: maxUploadSize(subscription),
@@ -42,8 +49,8 @@ async function find(userId: string, files?: File[]) {
   }
 }
 
-function maxUploadSize(subscription: Subscription) {
-  if (subscription.level === 'free') {
+function maxUploadSize(subscription: Subscription | null) {
+  if (!subscription) {
     return Uploads.ONE_MB;
   } else if (subscription.level === 'paid') {
     return Uploads.ONE_HUNDRED_MB;
@@ -63,11 +70,11 @@ interface CanNotUpload {
 export type CanUploadResponse = CanUpload | CanNotUpload;
 
 function canUpload(
-  subscription: Subscription,
+  subscription: Subscription | null,
   currentFiles: File[]
 ): CanUploadResponse {
   const maxUploads = maxUploadCount(subscription);
-  const statusIsValid = subscription.status === 'valid';
+  const statusIsValid = !subscription || subscription.stripeStatus === 'active';
   const hasRemainingUploads =
     maxUploads === null || currentFiles.length < maxUploads;
 
@@ -90,13 +97,11 @@ function canUpload(
   return { canUpload: true };
 }
 
-function maxUploadCount(subscription: Subscription) {
-  if (subscription.level === 'paid') {
+function maxUploadCount(subscription: Subscription | null) {
+  if (subscription?.level === 'paid') {
     return null;
-  } else {
-    // free account
-    return 1;
   }
+  return 1;
 }
 
 async function ensureValidSubscription({
@@ -116,7 +121,7 @@ async function ensureValidSubscription({
   userId?: string;
   subscription?: Subscription;
 }): Promise<null> {
-  let sub: Subscription;
+  let sub: Subscription | null;
   if (userId) {
     sub = (await find(userId)).subscription;
   } else if (subscription) {
@@ -125,14 +130,19 @@ async function ensureValidSubscription({
     throw json({ error: 'Unknown error' }, { status: 500 });
   }
 
-  if (sub.level !== 'free' && sub.status === 'payment_issue') {
-    throw json(
-      { error: 'There was an issue with your most recent payment' },
-      { status: 401 }
-    );
-  } else if (sub.level === 'free') {
+  if (!sub) {
     throw json(
       { error: 'Active subscription required to access this content' },
+      { status: 401 }
+    );
+  }
+
+  if (
+    sub.level !== 'free' &&
+    paymentFailedStatuses.includes(sub.stripeStatus)
+  ) {
+    throw json(
+      { error: 'There was an issue with your most recent payment' },
       { status: 401 }
     );
   }
@@ -150,4 +160,5 @@ export const Subscriptions = {
   maxUploadCount,
   ensureValidSubscription,
   update,
+  paymentFailedStatuses,
 };
