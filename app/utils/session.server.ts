@@ -71,6 +71,7 @@ const requireLoggedInUser = async (request: Request) => {
 
 export const Session = {
   get,
+  commitSession,
   headersWithSession,
   destroySessionWithHeaders,
   generateCsrfToken,

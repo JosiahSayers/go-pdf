@@ -20,7 +20,11 @@ const prices = {
   monthlyBilledSubscription: 'price_1MsFO9LSDKKGf5bYAmpG0chD',
 };
 
-async function initiatePayment(userId: string, price: keyof typeof prices) {
+async function initiatePayment(
+  userId: string,
+  price: keyof typeof prices,
+  sessionToken: string
+) {
   const user = await db.user.findUnique({
     where: { id: userId },
     include: { profile: true },
@@ -42,6 +46,13 @@ async function initiatePayment(userId: string, price: keyof typeof prices) {
     customerId = customer.id;
   }
 
+  const createRedirectUrl = (status: string) => {
+    const params = new URLSearchParams();
+    params.set('status', status);
+    params.set('session', sessionToken);
+    return `${DeployInfo.url}/payment-response?${params}`;
+  };
+
   return stripe.checkout.sessions.create({
     line_items: [
       {
@@ -50,8 +61,8 @@ async function initiatePayment(userId: string, price: keyof typeof prices) {
       },
     ],
     mode: 'subscription',
-    success_url: `${DeployInfo.url}/payment-response?status=success`,
-    cancel_url: `${DeployInfo.url}/payment-response?status=cancel`,
+    success_url: createRedirectUrl('success'),
+    cancel_url: createRedirectUrl('cancel'),
     automatic_tax: { enabled: true },
     customer: customerId,
     customer_update: {
@@ -61,7 +72,26 @@ async function initiatePayment(userId: string, price: keyof typeof prices) {
   });
 }
 
-async function processPaymentResponse(status: string) {
+async function processPaymentResponse(userId: string, status: string) {
+  if (status === 'success') {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: { subscription: true },
+    });
+
+    if (!user) {
+      throw new UserNotFoundError(userId);
+    }
+
+    const query = `metadata["id"]:"${user.subscription?.stripeId}"`;
+
+    if (user.subscription?.stripeStatus !== 'active') {
+      const subscriptionFromStripe = await stripe.subscriptions.retrieve(
+        user.subscription.stripeId
+      );
+      console.log({ query, subscriptionFromStripe });
+    }
+  }
   // const session = await db.paymentSession.findUnique({
   //   where: { id: sessionId },
   // });

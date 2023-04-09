@@ -5,6 +5,7 @@ import { json } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
 import Header from '~/components/dashboard/header';
 import AppFooter from '~/components/footer';
+import { Payments } from '~/utils/payment.server';
 import { Session } from '~/utils/session.server';
 
 export async function loader({ request }: LoaderArgs) {
@@ -13,6 +14,7 @@ export async function loader({ request }: LoaderArgs) {
   if (!name) {
     return redirect('/');
   }
+  await Payments.processPaymentResponse(session.get('userId')!, 'success');
   return json({ user: { name } });
 }
 

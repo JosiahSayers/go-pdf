@@ -8,9 +8,11 @@ import { Session } from '~/utils/session.server';
 
 export async function action({ request }: ActionArgs) {
   const userId = await Session.requireLoggedInUser(request);
+  const session = await Session.get(request);
   const paymentSession = await Payments.initiatePayment(
     userId,
-    'monthlyBilledSubscription'
+    'monthlyBilledSubscription',
+    await Session.commitSession(session)
   );
 
   if (!paymentSession.url) {

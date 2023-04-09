@@ -1,3 +1,4 @@
+import type { SubscriptionLevel } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type Stripe from 'stripe';
 import { db } from '~/utils/db.server';
@@ -15,7 +16,6 @@ const supportedWebhooks = [
   'invoice.finalized',
   'invoice.finalization_failed',
   'invoice.paid',
-  'invoice.payment_action_required',
   'invoice.payment_failed',
   'invoice.updated',
 ] as const;
@@ -24,6 +24,11 @@ async function processWebhook(
   type: typeof supportedWebhooks[number],
   event: Stripe.Event
 ) {
+  console.log(
+    `Processing Stripe Webhook (${type}) for ID: ${
+      (event.data.object as any).id
+    }`
+  );
   switch (type) {
     case 'customer.subscription.created':
       return processSubscriptionCreatedEvent(
@@ -44,42 +49,57 @@ async function processWebhook(
     case 'invoice.finalized':
       return processInvoiceFinalizedEvent(event.data.object as Stripe.Invoice);
     case 'invoice.finalization_failed':
-      return provessInvoiceFinalizationFailedEvent(
+      return processInvoiceFinalizationFailedEvent(
         event.data.object as Stripe.Invoice
       );
-    case 'invoice.payment_action_required': {
-      throw new Error(
-        'Not implemented yet: "invoice.payment_action_required" case'
+    case 'invoice.payment_failed':
+      return processInvoicePaymentFailedEvent(
+        event.data.object as Stripe.Invoice
       );
-    }
-    case 'invoice.payment_failed': {
-      throw new Error('Not implemented yet: "invoice.payment_failed" case');
-    }
-    case 'invoice.updated': {
-      throw new Error('Not implemented yet: "invoice.updated" case');
-    }
+    case 'invoice.updated':
+      return processInvoiceUpdatedEvent(event.data.object as Stripe.Invoice);
   }
 }
 
 async function processSubscriptionCreatedEvent(data: Stripe.Subscription) {
   const user = await db.user.findUnique({
     where: { stripeId: data.customer.toString() },
+    include: { subscription: true },
   });
   if (!user) {
     throw new UserNotFoundError();
   }
 
-  await db.subscription.create({
-    data: {
-      userId: user?.id,
-      level: 'paid', // TODO: update based on data.items once more levels are created
-      stripeId: data.id,
-      cancelAtPeriodEnd: data.cancel_at_period_end,
-      currentPeriodEnd: new Date(data.current_period_end * 1000),
-      currentPeriodStart: new Date(data.current_period_start * 1000),
-      stripeStatus: data.status,
-    },
-  });
+  const subscriptionData = {
+    userId: user.id,
+    level: 'paid' as SubscriptionLevel, // TODO: update based on data.items once more levels are created
+    stripeId: data.id,
+    cancelAtPeriodEnd: data.cancel_at_period_end,
+    currentPeriodEnd: new Date(data.current_period_end * 1000),
+    currentPeriodStart: new Date(data.current_period_start * 1000),
+    stripeStatus: data.status,
+  };
+
+  if (user.subscription) {
+    console.log(
+      `Subscription created for user who already has a subscription object`,
+      {
+        newSubscriptionId: data.id,
+        oldSubscriptionId: user.subscription.id,
+        oldSubscriptionStripeId: user.subscription.stripeId,
+        userId: user.id,
+        userStripeId: user.stripeId,
+      }
+    );
+    await db.subscription.update({
+      where: { stripeId: user.subscription.stripeId },
+      data: subscriptionData,
+    });
+  } else {
+    await db.subscription.create({
+      data: subscriptionData,
+    });
+  }
 }
 
 async function processSubscriptionUpdatedEvent(data: Stripe.Subscription) {
@@ -168,7 +188,50 @@ async function processInvoiceFinalizedEvent(data: Stripe.Invoice) {
   }
 }
 
-async function provessInvoiceFinalizationFailedEvent(data: Stripe.Invoice) {
+async function processInvoiceFinalizationFailedEvent(data: Stripe.Invoice) {
+  try {
+    // This event fires when Stripe is not able to properly determine the tax location
+    // for a user. This should never fire as we're using stripe checkout page and requiring
+    // an address to be entered.
+    console.log(`Invoice ID ${data.id} - Finalization Failed`);
+    await db.invoice.update({
+      where: { stripeId: data.id },
+      data: {
+        status: data.status ?? undefined,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw new InvoiceNotFoundError(data.id);
+      }
+    }
+    throw e;
+  }
+}
+
+async function processInvoicePaymentFailedEvent(data: Stripe.Invoice) {
+  try {
+    // Stripe handles customer contact and payment retires automatically.
+    // We log that it happened but don't contact the customer.
+    console.log(`Invoice ID ${data.id} - Payment Failed`);
+    await db.invoice.update({
+      where: { stripeId: data.id },
+      data: {
+        status: data.status ?? undefined,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw new InvoiceNotFoundError(data.id);
+      }
+    }
+    throw e;
+  }
+}
+
+async function processInvoiceUpdatedEvent(data: Stripe.Invoice) {
   try {
     await db.invoice.update({
       where: { stripeId: data.id },
