@@ -7,10 +7,10 @@ export async function loader({ request }: LoaderArgs) {
   const status = params.get('status');
   if (!status) {
     return json({
-      error: 'sessionId and status query parameters are required',
+      error: 'status query parameter is required',
     });
   }
 
-  // await Payments.processPaymentResponse(sessionId, status);
+  await Payments.processPaymentResponse(status);
   return json({ success: true });
 }
