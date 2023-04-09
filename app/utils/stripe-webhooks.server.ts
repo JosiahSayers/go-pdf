@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type Stripe from 'stripe';
 import { db } from '~/utils/db.server';
 import {
@@ -7,7 +8,6 @@ import {
 } from '~/utils/Errors.server';
 
 const supportedWebhooks = [
-  'customer.updated',
   'customer.subscription.created',
   'customer.subscription.deleted',
   'customer.subscription.updated',
@@ -41,17 +41,12 @@ async function processWebhook(
       return processInvoiceCreatedEvent(event.data.object as Stripe.Invoice);
     case 'invoice.paid':
       return processInvoicePaidEvent(event.data.object as Stripe.Invoice);
-    case 'customer.updated': {
-      throw new Error('Not implemented yet: "customer.updated" case');
-    }
-    case 'invoice.finalized': {
-      throw new Error('Not implemented yet: "invoice.finalized" case');
-    }
-    case 'invoice.finalization_failed': {
-      throw new Error(
-        'Not implemented yet: "invoice.finalization_failed" case'
+    case 'invoice.finalized':
+      return processInvoiceFinalizedEvent(event.data.object as Stripe.Invoice);
+    case 'invoice.finalization_failed':
+      return provessInvoiceFinalizationFailedEvent(
+        event.data.object as Stripe.Invoice
       );
-    }
     case 'invoice.payment_action_required': {
       throw new Error(
         'Not implemented yet: "invoice.payment_action_required" case'
@@ -97,6 +92,7 @@ async function processSubscriptionUpdatedEvent(data: Stripe.Subscription) {
     throw new SubscriptionNotFoundError(data.id.toString());
   }
 
+  // TODO: update level based on data.items once more levels are created
   await db.subscription.update({
     where: { stripeId: data.id },
     data: {
@@ -132,22 +128,62 @@ async function processInvoiceCreatedEvent(data: Stripe.Invoice) {
 }
 
 async function processInvoicePaidEvent(data: Stripe.Invoice) {
-  const invoice = await db.invoice.findUnique({
-    where: { stripeId: data.id },
-  });
-  if (!invoice) throw new InvoiceNotFoundError(data.id);
+  try {
+    await db.invoice.update({
+      where: { stripeId: data.id },
+      data: {
+        stripeId: data.id,
+        hostedUrl: data.hosted_invoice_url,
+        pdfUrl: data.invoice_pdf,
+        invoiceNumber: data.number,
+        billingReason: data.billing_reason,
+        status: data.status ?? undefined,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw new InvoiceNotFoundError(data.id);
+      }
+    }
+    throw e;
+  }
+}
 
-  await db.invoice.update({
-    where: { stripeId: data.id },
-    data: {
-      stripeId: data.id,
-      hostedUrl: data.hosted_invoice_url,
-      pdfUrl: data.invoice_pdf,
-      invoiceNumber: data.number,
-      billingReason: data.billing_reason,
-      status: data.status ?? undefined,
-    },
-  });
+async function processInvoiceFinalizedEvent(data: Stripe.Invoice) {
+  try {
+    await db.invoice.update({
+      where: { stripeId: data.id },
+      data: {
+        status: data.status ?? undefined,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw new InvoiceNotFoundError(data.id);
+      }
+    }
+    throw e;
+  }
+}
+
+async function provessInvoiceFinalizationFailedEvent(data: Stripe.Invoice) {
+  try {
+    await db.invoice.update({
+      where: { stripeId: data.id },
+      data: {
+        status: data.status ?? undefined,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === 'P2025') {
+        throw new InvoiceNotFoundError(data.id);
+      }
+    }
+    throw e;
+  }
 }
 
 export const StripeWebhooks = {
