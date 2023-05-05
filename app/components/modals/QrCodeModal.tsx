@@ -37,9 +37,8 @@ export default function QrCodeModal({
 
       <Text size="sm">
         This QR code links directly to your PDF. Download it, print it, add it
-        to your social media. It code will work as long as the PDF is not
-        deleted from PdfMe, even if you decide to change the URL or update the
-        PDF itself.
+        to your social media. It will work as long as the PDF is not deleted
+        from GoPDF, even if you decide to change the URL.
       </Text>
 
       {imageLoading && <Skeleton h={408} w={408} />}

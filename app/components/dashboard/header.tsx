@@ -1,26 +1,25 @@
 import type { HeaderProps } from '@mantine/core';
+import { Anchor } from '@mantine/core';
 import { Group } from '@mantine/core';
-import { Header as MantineHeader, Title } from '@mantine/core';
+import { Header as MantineHeader, Image } from '@mantine/core';
+import { Link } from '@remix-run/react';
+import { useUser } from '~/components/context/user';
 
 interface Props extends Omit<HeaderProps, 'children' | 'height'> {
-  user: {
-    name: string;
-  };
   height?: HeaderProps['height'];
 }
 
-export default function Header({
-  user,
-  height = 60,
-  px = '3rem',
-  ...props
-}: Props) {
+export default function Header({ height = 60, px = '3rem', ...props }: Props) {
+  const user = useUser();
+
   return (
     <MantineHeader height={height} px={px} {...props}>
       <Group sx={{ height: '100%' }} position="apart">
-        <Title order={1}>PdfMe</Title>
+        <Anchor component={Link} to="/">
+          <Image src="/logo.png" width={100} alt="GoPDF" />
+        </Anchor>
         <Group>
-          <p>{user.name}</p>
+          <p>{user?.name}</p>
         </Group>
       </Group>
     </MantineHeader>

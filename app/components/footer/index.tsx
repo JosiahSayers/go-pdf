@@ -14,7 +14,7 @@ export default function AppFooter() {
     []
   );
 
-  const pdfMeLinks: FooterLink[] = useMemo(
+  const GoPdfLinks: FooterLink[] = useMemo(
     () => [
       { text: 'Pricing', href: '/pricing' },
       { text: 'Terms & Conditions', href: '/terms-conditions' },
@@ -26,11 +26,11 @@ export default function AppFooter() {
     <Footer height={200} bg={theme.colors.dark[5]} style={{ color: 'white' }}>
       <Flex h="100%" w="100vw" align="center" justify="space-around">
         <Stack>
-          <Text>PdfMe</Text>
+          <Text>GoPDF</Text>
           <Text>&#169; {new Date().getFullYear()}</Text>
         </Stack>
         <FooterLinkSection title="Support" links={supportLinks} />
-        <FooterLinkSection title="About" links={pdfMeLinks} />
+        <FooterLinkSection title="About" links={GoPdfLinks} />
       </Flex>
     </Footer>
   );

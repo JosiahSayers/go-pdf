@@ -56,8 +56,8 @@ export default function AnalyticsModal({
             defaultValue={innerProps.file.url}
             label="Custom URL"
             description="Set a memorable URL to access this PDF"
-            icon={<Text>pdf.me/</Text>}
-            iconWidth={65}
+            icon={<Text>gopdf.app/</Text>}
+            iconWidth={85}
             name="url"
             disabled={!canEdit || fetcher.state === 'submitting'}
           />

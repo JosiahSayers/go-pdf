@@ -17,6 +17,7 @@ import { definedModals } from '~/components/modals';
 import { Notifications } from '@mantine/notifications';
 import { Session } from '~/utils/session.server';
 import { CsrfProvider } from '~/components/context/csrf';
+import { UserProvider } from '~/components/context/user';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -30,32 +31,38 @@ export async function loader({ request }: LoaderArgs) {
   const session = await Session.get(request);
   const csrf = Session.generateCsrfToken();
   session.set('csrfToken', csrf);
-  return json({ csrf }, { headers: await Session.headersWithSession(session) });
+  const userInfo = Session.getUserInfo(session);
+  return json(
+    { csrf, userInfo },
+    { headers: await Session.headersWithSession(session) }
+  );
 }
 
 export default function App() {
-  const { csrf } = useLoaderData<typeof loader>();
+  const { csrf, userInfo } = useLoaderData<typeof loader>();
 
   return (
     <CsrfProvider value={{ csrf }}>
-      <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-        <Notifications />
-        <ModalsProvider modals={definedModals}>
-          <html lang="en">
-            <head>
-              <StylesPlaceholder />
-              <Meta />
-              <Links />
-            </head>
-            <body>
-              <Outlet />
-              <ScrollRestoration />
-              <Scripts />
-              <LiveReload />
-            </body>
-          </html>
-        </ModalsProvider>
-      </MantineProvider>
+      <UserProvider value={userInfo}>
+        <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+          <Notifications />
+          <ModalsProvider modals={definedModals}>
+            <html lang="en">
+              <head>
+                <StylesPlaceholder />
+                <Meta />
+                <Links />
+              </head>
+              <body>
+                <Outlet />
+                <ScrollRestoration />
+                <Scripts />
+                <LiveReload />
+              </body>
+            </html>
+          </ModalsProvider>
+        </MantineProvider>
+      </UserProvider>
     </CsrfProvider>
   );
 }

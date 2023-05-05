@@ -3,13 +3,11 @@ import { Header as MantineHeader } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
 import { Link } from '@remix-run/react';
 import { useCallback } from 'react';
+import { useUser } from '~/components/context/user';
 
-interface Props {
-  isLoggedIn?: boolean;
-  name?: string;
-}
+export default function Header() {
+  const user = useUser();
 
-export default function Header({ isLoggedIn, name }: Props) {
   const openLoginModal = useCallback(
     () =>
       openContextModal({
@@ -35,7 +33,9 @@ export default function Header({ isLoggedIn, name }: Props) {
   return (
     <MantineHeader height={60} px="3rem">
       <Group sx={{ height: '100%' }} position="apart">
-        <Image src="/logo.png" width={100} alt="GoPDF" />
+        <Anchor component={Link} to="/">
+          <Image src="/logo.png" width={100} alt="GoPDF" />
+        </Anchor>
         <Group>
           <Anchor component={Link} to="/faq">
             FAQs
@@ -43,8 +43,8 @@ export default function Header({ isLoggedIn, name }: Props) {
           <Anchor component={Link} to="/pricing">
             Pricing
           </Anchor>
-          {isLoggedIn ? (
-            <Text>{name}</Text>
+          {user ? (
+            <Text>{user.name}</Text>
           ) : (
             <>
               <Button variant="subtle" onClick={openLoginModal}>

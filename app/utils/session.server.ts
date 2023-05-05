@@ -30,6 +30,7 @@ const { getSession, commitSession, destroySession } =
 
 const get = async (request: Request) =>
   getSession(request.headers.get('Cookie'));
+
 const headersWithSession = async (
   session: Parameters<typeof commitSession>[0],
   inputHeaders: HeadersInit = {}
@@ -38,6 +39,7 @@ const headersWithSession = async (
   headers.set('Set-Cookie', await commitSession(session));
   return headers;
 };
+
 const destroySessionWithHeaders = async (
   session: Parameters<typeof destroySession>[0],
   inputHeaders: HeadersInit = {}
@@ -46,7 +48,9 @@ const destroySessionWithHeaders = async (
   headers.set('Set-Cookie', await destroySession(session));
   return headers;
 };
+
 const generateCsrfToken = () => randomBytes(100).toString('base64');
+
 const validateCsrf = async (request: Request) => {
   const requestCopy = request.clone();
   const session = await get(requestCopy);
@@ -60,6 +64,7 @@ const validateCsrf = async (request: Request) => {
   }
   return session;
 };
+
 const requireLoggedInUser = async (request: Request) => {
   const session = await get(request);
   const userId = session.get('userId');
@@ -69,8 +74,24 @@ const requireLoggedInUser = async (request: Request) => {
   return userId;
 };
 
+const getUserInfo = (session: Awaited<ReturnType<typeof get>>) => {
+  const id = session.get('userId');
+  const name = session.get('name');
+  if (id && name) {
+    return { id, name };
+  }
+  return null;
+};
+
+const isLoggedIn = async (request: Request) => {
+  const session = await get(request);
+  return Boolean(session.get('userId'));
+};
+
 export const Session = {
   get,
+  getUserInfo,
+  isLoggedIn,
   commitSession,
   headersWithSession,
   destroySessionWithHeaders,
