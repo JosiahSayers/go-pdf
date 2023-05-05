@@ -153,6 +153,24 @@ async function update(subscriptionId: string, data: Partial<Subscription>) {
   return db.subscription.update({ where: { id: subscriptionId }, data });
 }
 
+// export interface SubscriptionInfo {
+//   title: string;
+//   price: number;
+//   maxUploadSize: number;
+//   maxUploadCount: number | null;
+//   isActive: boolean;
+// }
+
+// function getAllSubscriptions(): SubscriptionInfo[] {
+//   return [
+//     [SubscriptionLevel.free]: {
+//       title: 'Free',
+//       price: 0,
+//       maxUploadSize: maxUploadSize()
+//     }
+//   ];
+// }
+
 export const Subscriptions = {
   find,
   maxUploadSize,
