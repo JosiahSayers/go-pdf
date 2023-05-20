@@ -61,18 +61,24 @@ export default function PdfHosting() {
           Within seconds it will be ready to view worldwide.
         </MarketingFeature>
 
-        <MarketingFeature title="QR Code Built In">
+        <MarketingFeature title="Free Shareable Link">
+          Each PDF you upload will be given a random link. This short and
+          memorable link is easy to share wherever you need it.
+        </MarketingFeature>
+
+        <MarketingFeature title="Custom Links" paidOnly>
+          Sometimes you want your PDF link to seemlessly blend in to your
+          existing marketing. With a paid account you can customize the link for
+          every PDF you upload, as many times as you want.
+        </MarketingFeature>
+
+        <MarketingFeature title="QR Code Built In" paidOnly>
           Need an easy way to share your PDF? We'll create a unique QR code for
           each of your PDFs. This is great for restaurants who want to share
           their menu with patrons.
         </MarketingFeature>
 
-        <MarketingFeature title="Free Shareable Link">
-          Each PDF you upload will be given a random link. If you don't like
-          what we generated you're free to change it as many times as you want.
-        </MarketingFeature>
-
-        <MarketingFeature title="Analytics & Insights">
+        <MarketingFeature title="Analytics & Insights" paidOnly>
           See how often your PDF is being viewed with analytics built in to the
           platform.
         </MarketingFeature>
