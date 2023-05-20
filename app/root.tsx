@@ -18,6 +18,7 @@ import { Notifications } from '@mantine/notifications';
 import { Session } from '~/utils/session.server';
 import { UserProvider } from '~/components/context/user';
 import { AuthenticityTokenProvider } from 'remix-utils';
+import useRevalidateOnFocus from '~/components/hooks/revalidate-on-focus';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -39,6 +40,7 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function App() {
   const { csrf, userInfo } = useLoaderData<typeof loader>();
+  useRevalidateOnFocus();
 
   return (
     <AuthenticityTokenProvider token={csrf}>

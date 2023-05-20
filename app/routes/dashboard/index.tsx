@@ -3,7 +3,7 @@ import type { FileWithPath } from '@mantine/dropzone';
 import type { FileRejection } from 'react-dropzone';
 import { PDF_MIME_TYPE } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
-import type { ActionArgs, LoaderArgs } from '@remix-run/node';
+import type { ActionArgs, HeadersFunction, LoaderArgs } from '@remix-run/node';
 import { unstable_parseMultipartFormData } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
@@ -18,6 +18,10 @@ import { filesize } from 'filesize';
 import { Subscriptions } from '~/utils/subscription.server';
 import SubscriptionStatus from '~/components/dashboard/subscription-status';
 import { useAuthenticityToken } from 'remix-utils';
+
+export const headers: HeadersFunction = () => {
+  return { 'Cache-Control': 'no-store' };
+};
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
