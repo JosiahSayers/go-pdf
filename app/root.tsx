@@ -16,8 +16,8 @@ import { theme } from '~/theme';
 import { definedModals } from '~/components/modals';
 import { Notifications } from '@mantine/notifications';
 import { Session } from '~/utils/session.server';
-import { CsrfProvider } from '~/components/context/csrf';
 import { UserProvider } from '~/components/context/user';
+import { AuthenticityTokenProvider } from 'remix-utils';
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -29,8 +29,7 @@ createEmotionCache({ key: 'mantine' });
 
 export async function loader({ request }: LoaderArgs) {
   const session = await Session.get(request);
-  const csrf = Session.generateCsrfToken();
-  session.set('csrfToken', csrf);
+  const csrf = await Session.generateCsrfToken(session);
   const userInfo = Session.getUserInfo(session);
   return json(
     { csrf, userInfo },
@@ -42,7 +41,7 @@ export default function App() {
   const { csrf, userInfo } = useLoaderData<typeof loader>();
 
   return (
-    <CsrfProvider value={{ csrf }}>
+    <AuthenticityTokenProvider token={csrf}>
       <UserProvider value={userInfo}>
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
           <Notifications />
@@ -63,6 +62,6 @@ export default function App() {
           </ModalsProvider>
         </MantineProvider>
       </UserProvider>
-    </CsrfProvider>
+    </AuthenticityTokenProvider>
   );
 }

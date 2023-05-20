@@ -1,12 +1,11 @@
 import type { ContextModalProps } from '@mantine/modals';
 import { Button, Group, Space, Stack, Text } from '@mantine/core';
 import { useFetcher, useNavigate } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 import ValidatedTextInput from '~/components/ValidatedTextInput';
-import CsrfInput from '~/components/csrf-input';
 import { useEffect } from 'react';
 import { registerFormValidator } from '~/routes/api/register';
 import { notifications } from '@mantine/notifications';
+import ValidatedFormWithCsrf from '~/components/forms/ValidatedFormWithCsrf';
 
 export default function RegisterModal({ context, id }: ContextModalProps<{}>) {
   const fetcher = useFetcher();
@@ -26,7 +25,7 @@ export default function RegisterModal({ context, id }: ContextModalProps<{}>) {
   }, [fetcher.data]);
 
   return (
-    <ValidatedForm
+    <ValidatedFormWithCsrf
       fetcher={fetcher}
       validator={registerFormValidator}
       method="post"
@@ -56,8 +55,6 @@ export default function RegisterModal({ context, id }: ContextModalProps<{}>) {
           withAsterisk
         />
 
-        <CsrfInput />
-
         <Group position="right">
           <Button
             variant="outline"
@@ -78,6 +75,6 @@ export default function RegisterModal({ context, id }: ContextModalProps<{}>) {
           </Button>
         </Group>
       </Stack>
-    </ValidatedForm>
+    </ValidatedFormWithCsrf>
   );
 }

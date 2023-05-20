@@ -1,5 +1,5 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node';
-import { randomBytes } from 'crypto';
+import { createAuthenticityToken, verifyAuthenticityToken } from 'remix-utils';
 
 type SessionData = {
   userId?: string;
@@ -49,19 +49,11 @@ const destroySessionWithHeaders = async (
   return headers;
 };
 
-const generateCsrfToken = () => randomBytes(100).toString('base64');
+const generateCsrfToken = createAuthenticityToken;
 
 const validateCsrf = async (request: Request) => {
-  const requestCopy = request.clone();
-  const session = await get(requestCopy);
-  const body = await requestCopy.formData();
-  if (
-    !session.has('csrfToken') ||
-    !body.get('csrf') ||
-    session.get('csrfToken') !== body.get('csrf')
-  ) {
-    throw new Error('CSRF error');
-  }
+  const session = await get(request);
+  await verifyAuthenticityToken(request, session);
   return session;
 };
 

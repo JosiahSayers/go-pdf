@@ -8,7 +8,6 @@ import { unstable_parseMultipartFormData } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
 import { useCallback, useEffect } from 'react';
-import { useCsrf } from '~/components/context/csrf';
 import PdfCard from '~/components/dashboard/pdf-card';
 import PdfCardSkeleton from '~/components/dashboard/pdf-card/skeleton';
 import Dropzone from '~/components/dropzone';
@@ -18,6 +17,7 @@ import { FileTooLargeError, Uploads } from '~/utils/upload-handler';
 import { filesize } from 'filesize';
 import { Subscriptions } from '~/utils/subscription.server';
 import SubscriptionStatus from '~/components/dashboard/subscription-status';
+import { useAuthenticityToken } from 'remix-utils';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await Session.requireLoggedInUser(request);
@@ -64,7 +64,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function Dashboard() {
-  const csrf = useCsrf();
+  const csrf = useAuthenticityToken();
   const {
     existingObjects,
     maxUploadSize,

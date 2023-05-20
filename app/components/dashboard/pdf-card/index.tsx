@@ -16,7 +16,7 @@ import { useCallback } from 'react';
 import { openContextModal } from '@mantine/modals';
 import PdfCardDeleteButton from '~/components/dashboard/pdf-card/delete-button';
 import PdfCardActionButton from '~/components/dashboard/pdf-card/action-button';
-import { useCsrf } from '~/components/context/csrf';
+import { useAuthenticityToken } from 'remix-utils';
 
 interface Props {
   file: SerializeFrom<File>;
@@ -31,7 +31,7 @@ export default function PdfCard({
 }: Props) {
   const [opened, { close }] = useDisclosure(true);
   const fetcher = useFetcher();
-  const csrf = useCsrf();
+  const csrf = useAuthenticityToken();
 
   const openAnalyticsModal = () =>
     openContextModal({
