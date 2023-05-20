@@ -4,7 +4,7 @@ import type { File, SubscriptionLevel } from '@prisma/client';
 import type { SerializeFrom } from '@remix-run/node';
 import { useFetcher } from '@remix-run/react';
 import { editPdfValidator } from '~/routes/api/edit/$id';
-import ValidatedTextInput from '~/components/ValidatedTextInput';
+import ValidatedTextInput from '~/components/forms/ValidatedTextInput';
 import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 import LockedFeatureAlert from '~/components/locked-feature-alert';

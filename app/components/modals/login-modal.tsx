@@ -2,7 +2,7 @@ import type { ContextModalProps } from '@mantine/modals';
 import { Button, Group, Stack } from '@mantine/core';
 import { useFetcher, useNavigate } from '@remix-run/react';
 import { loginFormValidator } from '~/routes/api/login';
-import ValidatedTextInput from '~/components/ValidatedTextInput';
+import ValidatedTextInput from '~/components/forms/ValidatedTextInput';
 import { useEffect } from 'react';
 import { notifications } from '@mantine/notifications';
 import ValidatedFormWithCsrf from '~/components/forms/ValidatedFormWithCsrf';

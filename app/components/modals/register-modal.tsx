@@ -1,7 +1,7 @@
 import type { ContextModalProps } from '@mantine/modals';
 import { Button, Group, Space, Stack, Text } from '@mantine/core';
 import { useFetcher, useNavigate } from '@remix-run/react';
-import ValidatedTextInput from '~/components/ValidatedTextInput';
+import ValidatedTextInput from '~/components/forms/ValidatedTextInput';
 import { useEffect } from 'react';
 import { registerFormValidator } from '~/routes/api/register';
 import { notifications } from '@mantine/notifications';
