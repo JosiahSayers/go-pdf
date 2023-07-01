@@ -1,7 +1,8 @@
 import { SubscriptionStatus } from '@prisma/client';
-import type { File, Subscription } from '@prisma/client';
+import type { File, Subscription, User } from '@prisma/client';
 import { json } from '@remix-run/node';
 import { db } from '~/utils/db.server';
+import { Email } from '~/utils/email.server';
 import { Uploads } from '~/utils/upload-handler';
 
 export class SubscriptionNotFoundError extends Error {}
@@ -151,7 +152,11 @@ async function ensureValidSubscription({
 
 // TODO: if account is being lowered (paid -> free), loop through files and disable
 // any that are no longer valid. Over max size, over max number of uploads, etc.
-async function update(subscriptionId: string, data: Partial<Subscription>) {
+async function update(
+  subscriptionId: string,
+  data: Partial<Subscription>,
+  user: User
+) {
   const subscription = await db.subscription.findFirst({
     where: { id: subscriptionId },
   });
@@ -182,6 +187,7 @@ async function update(subscriptionId: string, data: Partial<Subscription>) {
         },
       });
     });
+    await Email.subscriptionLowered(user);
   }
 
   return db.subscription.update({ where: { id: subscriptionId }, data });

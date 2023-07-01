@@ -9,6 +9,16 @@ const magicLink = async (user: User, link: any) => {
   }
 };
 
+const subscriptionLowered = async (user: User) => {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(
+      'Your subscription has been lowered. Some files you have uploaded may no longer be available until you restart your subscription.'
+    );
+  }
+  return;
+};
+
 export const Email = {
   magicLink,
+  subscriptionLowered,
 };
