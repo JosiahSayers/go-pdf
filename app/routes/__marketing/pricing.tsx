@@ -13,6 +13,7 @@ export interface SubscriptionInfo {
   maxUploadSize: number;
   maxUploadCount: number | null;
   isActive: boolean;
+  inactiveButtonText: string;
 }
 
 export async function loader({ request }: LoaderArgs) {
@@ -30,6 +31,7 @@ export async function loader({ request }: LoaderArgs) {
         maxUploadSize: Uploads.ONE_MB,
         maxUploadCount: 1,
         isActive: subscription?.level === 'free',
+        inactiveButtonText: userId ? 'Subscribe' : 'Create an account',
       },
       hobby: {
         title: 'Hobby',
@@ -37,6 +39,7 @@ export async function loader({ request }: LoaderArgs) {
         maxUploadSize: Uploads.ONE_HUNDRED_MB,
         maxUploadCount: null,
         isActive: subscription?.level === 'paid',
+        inactiveButtonText: 'Subscribe',
       },
     },
   });

@@ -7,7 +7,14 @@ interface Props {
 }
 
 export default function PricingCard({
-  subscription: { title, price, maxUploadCount, maxUploadSize, isActive },
+  subscription: {
+    title,
+    price,
+    maxUploadCount,
+    maxUploadSize,
+    isActive,
+    inactiveButtonText,
+  },
 }: Props) {
   const uploadCountText =
     maxUploadCount === null
@@ -32,7 +39,7 @@ export default function PricingCard({
         <Divider />
 
         <Button disabled={isActive}>
-          {isActive ? 'Current Subscription' : 'Subscribe'}
+          {isActive ? 'Current Subscription' : inactiveButtonText}
         </Button>
       </Stack>
     </Card>
