@@ -29,7 +29,7 @@ export default function PdfCard({
   subscriptionLevel,
   paymentFailure,
 }: Props) {
-  const [opened, { close }] = useDisclosure(true);
+  const [displayed, { close: hide }] = useDisclosure(true);
   const fetcher = useFetcher();
   const csrf = useAuthenticityToken();
 
@@ -70,7 +70,7 @@ export default function PdfCard({
     });
 
   const deleteFile = useCallback(() => {
-    close();
+    hide();
     fetcher.submit(
       {
         id: file.id,
@@ -81,10 +81,10 @@ export default function PdfCard({
         action: '/api/delete-file',
       }
     );
-  }, [fetcher, file, close, csrf]);
+  }, [fetcher, file, hide, csrf]);
 
   return (
-    <Collapse in={opened} transitionDuration={500}>
+    <Collapse in={displayed} transitionDuration={500}>
       <Card shadow="sm" padding="lg" withBorder>
         <Grid align="center">
           <Grid.Col span="content">

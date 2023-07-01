@@ -1,6 +1,6 @@
 import { useMantineTheme, Text, Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { IconX } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 
 interface Props {
@@ -23,7 +23,7 @@ export default function PdfCardDeleteButton({ onDelete }: Props) {
       ),
       labels: { confirm: 'Delete PDF', cancel: "No don't delete it" },
       confirmProps: { color: 'red' },
-      onConfirm: () => onDelete(),
+      onConfirm: onDelete,
     });
 
   return (
@@ -34,7 +34,7 @@ export default function PdfCardDeleteButton({ onDelete }: Props) {
       onMouseLeave={() => setHovered(false)}
       onClick={openDeleteModal}
     >
-      <IconX
+      <IconTrash
         width={30}
         height={30}
         stroke={1.5}

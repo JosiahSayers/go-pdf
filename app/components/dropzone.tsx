@@ -58,7 +58,7 @@ export default function Dropzone({ fullscreen, canUpload, ...props }: Props) {
           <Text size="sm" color="dimmed" inline mt={7}>
             Drop your file here
             {props.maxSize
-              ? `, it should not exceed ${filesize(props.maxSize)}`
+              ? `, it can be as large as ${filesize(props.maxSize)}`
               : ''}
           </Text>
         </div>
