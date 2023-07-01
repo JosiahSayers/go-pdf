@@ -91,13 +91,20 @@ model Invoice {
   userId String
 }
 
+enum FileDisableReason {
+  lowered_subscription
+  failed_payment
+}
+
 model File {
-  id        String   @id @default(uuid())
-  name      String?
-  url       String   @unique
-  mimeType  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String             @id @default(uuid())
+  name           String?
+  url            String             @unique
+  mimeType       String?
+  disabled       Boolean            @default(false)
+  disabledReason FileDisableReason?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   events FileEvent[] @relation()
   user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)

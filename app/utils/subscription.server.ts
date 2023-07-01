@@ -149,8 +149,54 @@ async function ensureValidSubscription({
   return null;
 }
 
+// TODO: if account is being lowered (paid -> free), loop through files and disable
+// any that are no longer valid. Over max size, over max number of uploads, etc.
 async function update(subscriptionId: string, data: Partial<Subscription>) {
+  const subscription = await db.subscription.findFirst({
+    where: { id: subscriptionId },
+  });
+
+  if (isSubscriptionBeingLowered(subscription, data)) {
+    const newMaxUploadCount = maxUploadCount({ ...subscription, ...data });
+    await db.$transaction(async (tx) => {
+      const stillValidFiles = await tx.file.findMany({
+        where: {
+          userId: subscription?.userId,
+          disabled: false,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: newMaxUploadCount ?? undefined,
+        select: { id: true },
+      });
+
+      await tx.file.updateMany({
+        where: {
+          userId: subscription?.userId,
+          id: { notIn: stillValidFiles.map((f) => f.id) },
+        },
+        data: {
+          disabled: true,
+          disabledReason: 'lowered_subscription',
+        },
+      });
+    });
+  }
+
   return db.subscription.update({ where: { id: subscriptionId }, data });
+}
+
+function isSubscriptionBeingLowered(
+  subscription: Subscription | null,
+  updateData: Partial<Subscription>
+  // subscription is defined if it is being lowered
+): subscription is Subscription {
+  if (subscription?.level === 'paid' && updateData.level === 'free') {
+    return true;
+  }
+
+  return false;
 }
 
 // export interface SubscriptionInfo {
