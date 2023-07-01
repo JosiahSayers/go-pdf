@@ -1,4 +1,4 @@
-import type { SubscriptionLevel } from '@prisma/client';
+import { type SubscriptionLevel } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import type Stripe from 'stripe';
 import { db } from '~/utils/db.server';
@@ -20,15 +20,21 @@ const supportedWebhooks = [
   'invoice.updated',
 ] as const;
 
+async function logWebhook(event: Stripe.Event) {
+  console.log(
+    `Processing Stripe Webhook (${event.type}) for ID: ${
+      (event.data.object as any).id
+    }`
+  );
+  await db.stripeEventLog.create({ data: { data: JSON.stringify(event) } });
+}
+
 async function processWebhook(
   type: typeof supportedWebhooks[number],
   event: Stripe.Event
 ) {
-  console.log(
-    `Processing Stripe Webhook (${type}) for ID: ${
-      (event.data.object as any).id
-    }`
-  );
+  await logWebhook(event);
+
   switch (type) {
     case 'customer.subscription.created':
       return processSubscriptionCreatedEvent(
@@ -91,15 +97,15 @@ async function processSubscriptionCreatedEvent(data: Stripe.Subscription) {
         userStripeId: user.stripeId,
       }
     );
-    await db.subscription.update({
-      where: { stripeId: user.subscription.stripeId },
-      data: subscriptionData,
-    });
-  } else {
-    await db.subscription.create({
-      data: subscriptionData,
-    });
   }
+
+  await db.subscription.upsert({
+    where: {
+      stripeId: user.subscription?.stripeId ?? subscriptionData.stripeId,
+    },
+    update: subscriptionData,
+    create: subscriptionData,
+  });
 }
 
 async function processSubscriptionUpdatedEvent(data: Stripe.Subscription) {

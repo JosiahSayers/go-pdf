@@ -126,3 +126,9 @@ model FileEvent {
   fileId String
   File   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
+
+model StripeEventLog {
+  id        String   @id @default(uuid())
+  data      Json
+  createdAt DateTime @default(now())
+}
