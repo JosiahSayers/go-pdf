@@ -1,5 +1,5 @@
 import type { ContextModalProps } from '@mantine/modals';
-import { Button, Stack } from '@mantine/core';
+import { Button, Space, Stack } from '@mantine/core';
 import { useFetcher } from '@remix-run/react';
 import { useEffect } from 'react';
 import type { loader } from '~/routes/api/analytics/$id';
@@ -8,6 +8,7 @@ import AnalyticsModalEvents from '~/components/modals/AnalyticsModal/Events';
 import AnalyticsModalSkeleton from '~/components/modals/AnalyticsModal/Skeleton';
 import type { SubscriptionLevel } from '@prisma/client';
 import LockedFeatureAlert from '~/components/locked-feature-alert';
+import AnalyticsModalStats from '~/components/modals/AnalyticsModal/AnalyticsModalStats';
 
 export default function AnalyticsModal({
   context,
@@ -42,6 +43,12 @@ export default function AnalyticsModal({
         </LockedFeatureAlert>
       )}
       {(loading || !canView) && <AnalyticsModalSkeleton animate={canView} />}
+      {(noEvents || showEvents) && (
+        <AnalyticsModalStats stats={fetcher.data!} />
+      )}
+
+      <Space h="lg" />
+
       {noEvents && <AnalyticsModalNoEvents />}
       {showEvents && <AnalyticsModalEvents events={fetcher.data!} />}
 
